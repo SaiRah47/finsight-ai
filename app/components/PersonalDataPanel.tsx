@@ -31,8 +31,8 @@ export default function PersonalDataPanel({mode}:{mode:'watchlist'|'history'}){
   if(!/^[A-Z][A-Z0-9.\-]{0,11}$/.test(value)){setError('Enter a valid symbol, such as AAPL or BRK.B.');return}
   const {data:{user}}=await db.auth.getUser();
   if(!user){setError('Session expired. Please sign in again.');return}
-  const {error:e}=await db.from('watchlist_symbols').insert({user_id:user.id,symbol:value});
-  if(e)setError(e.code==='23505'?'Already in your watchlist.':e.message);else{setSymbol('');void load()}
+  const {error:insertError}=await db.from('watchlist_symbols').insert({user_id:user.id,symbol:value});
+  if(insertError)setError(insertError.code==='23505'?'Already in your watchlist.':insertError.message);else{setSymbol('');void load()}
  }
  async function remove(id:string){
   if(!db)return;
