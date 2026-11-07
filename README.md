@@ -50,3 +50,7 @@ FinSight now includes a dedicated SEC EDGAR filings view, first-party issuer CIK
 ### Retrieval-quality regression suite
 
 Milestone 4 includes a synthetic SEC-style labeled benchmark with Hit@1, Recall@3, MRR, and a limited false-positive measure. It runs in GitHub Actions and uploads the case-level report as an artifact. These are **synthetic regression checks, not verified performance on real filings**. See [evaluation methodology](docs/RETRIEVAL_EVALUATION.md).
+
+### Fixed-source SEC retrieval comparison (on demand)
+
+In the SEC filings tab, the **Real SEC retrieval lab** runs bounded, owner-only comparisons against fixed official 10-K sources from NVIDIA, Microsoft, and Apple. It compares our weighted lexical ranker with BM25 and reports source coverage and evidence-anchor rank. An optional embeddings-based **candidate reranker** is available only after explicit user opt-in and configuring a server-only OpenAI API key; it may incur costs. The experiment is not a statistically meaningful production benchmark. See [evaluation details](docs/RETRIEVAL_EVALUATION.md).
