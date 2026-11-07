@@ -398,3 +398,29 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 /* SEC retrieval diagnostics. These are relevance signals, never probability estimates. */
 .sec-match-metadata{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:#9cacc8;line-height:1.6}
 .sec-match-metadata span:first-child{color:#93e4dd}
+
+/* Fixed-source SEC retrieval benchmarking (small diagnostic lab) */
+.real-sec-benchmark{display:grid;gap:13px;margin-top:18px;border-top:1px solid #ffffff21;padding-top:20px}
+.benchmark-intro{font-size:11px;color:#a7adc8;line-height:1.75;margin:0}
+.benchmark-controls{border:1px solid #ffffff21;border-radius:17px;padding:17px;background:#161a2e;display:grid;gap:14px;justify-items:start}
+.benchmark-issuers{display:flex;gap:7px;flex-wrap:wrap}
+.benchmark-issuers button{border:1px solid #ffffff29;border-radius:9px;background:#0f1424;color:#bbb6d6;font-size:12px;padding:9px 15px;font-weight:700}
+.benchmark-issuers button.active{background:#b8a6ff;color:#151627}
+.benchmark-optin{display:flex;align-items:center;gap:10px;font-size:11px;color:#bdc3dc;line-height:1.5}
+.benchmark-optin input{accent-color:#87e4e8;width:16px;height:16px;flex-shrink:0}
+.benchmark-controls small{font-size:10px;color:#959dbb;line-height:1.6}
+.benchmark-result{display:grid;gap:15px}
+.benchmark-source,.benchmark-coverage{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.benchmark-source strong{font-size:13px}.benchmark-source a{font-size:11px;color:#87e4e8;text-decoration:underline}
+.benchmark-question{display:grid;gap:9px;border-radius:14px;background:#15192c;border:1px solid #ffffff18;padding:16px}
+.benchmark-question small,.benchmark-question span{font-size:10px;color:#a4aec8}
+.benchmark-question strong{font-size:14px;color:#e4e1fb;line-height:1.5}
+.benchmark-coverage{font-size:10px;color:#bac0db;border-bottom:1px solid #ffffff1c;padding-bottom:12px}
+.benchmark-rankers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.benchmark-rankers article{display:grid;gap:10px;background:#1c1b32;border:1px solid #ffffff22;border-radius:14px;padding:18px}
+.benchmark-rankers small,.benchmark-rankers span{font-size:10px;color:#a7acc7}
+.benchmark-rankers strong{font-size:16px;color:#b8e8e4}
+.benchmark-semantic{display:grid;gap:9px;border:1px solid #b8a6ff48;border-radius:13px;padding:16px;font-size:12px}
+.benchmark-semantic small{color:#9ca6c4;line-height:1.6}
+.benchmark-disclaimer{font-size:10px;color:#969fbc;line-height:1.7}
+@media(max-width:700px){.benchmark-rankers{grid-template-columns:1fr}.benchmark-controls>.primary{width:100%}}

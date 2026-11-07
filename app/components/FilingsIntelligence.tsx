@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import RetrievalBenchmark from './RetrievalBenchmark';
 type Filing={id:string;form:string;filed:string;reportDate:string|null;url:string;description:string};
 type Fact={id:string;label:string;value:number;unit:string;end:string;filed:string;form:string;url:string};
 type Passage={id:string;section:string;text:string;score:number;matchedTerms:string[];start:number;form:string;filed:string;url:string;accession:string};
@@ -75,6 +76,7 @@ export default function FilingsIntelligence({onResearch}:{onResearch?:(question:
     {!passageData.passages.length&&<p>No matching document excerpts were available. Don't infer missing text from metadata.</p>}
     {passageData.warnings.length>0&&<details><summary>Retrieval notes ({passageData.warnings.length})</summary>{passageData.warnings.map((warning,i)=><p key={i}>{warning}</p>)}</details>}
    </div>}
+   <RetrievalBenchmark/>
    {onResearch&&<button className="secondary sec-research-action" onClick={()=>onResearch('Summarize the latest SEC 10-K and 10-Q filings for '+data.symbol)}>Research these SEC filings ↗</button>}
    {data.warnings.length>0&&<details className="sec-caveats"><summary>Data availability notes ({data.warnings.length})</summary>{data.warnings.map((w,i)=><p key={i}>{w}</p>)}</details>}
    <p className="sec-disclaimer">Source: SEC EDGAR submissions and XBRL concepts. A filing date is not its financial reporting period. Revenue and net income can represent different durations; do not compare without reviewing the source filing. Passages are extracted from bounded portions of recent filing text; the result is not a complete review of all risk disclosures.</p>
