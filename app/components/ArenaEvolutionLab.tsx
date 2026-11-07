@@ -74,11 +74,17 @@ export default function ArenaEvolutionLab({agents}:{agents:Agent[]}){
       {latest.steps.length>0&&<details className="arena-evolution-history"><summary>Session equity observations ({latest.steps.length} recent)</summary>
        {latest.steps.slice(-12).reverse().map(step=><div key={step.day}><span>{step.day}</span><span>{cash(step.baselineEquity)}</span><span>{cash(step.candidateEquity)}</span></div>)}
       </details>}
+      {latest.status==='active'&&!latest.comparison.eligible&&<details className="arena-evolution-retire"><summary>End this experiment without promotion</summary>
+       <p className="atlas-hint">Retiring this candidate retains all comparison history and unlocks a new experiment. The live paper strategy remains unchanged.</p>
+       <label>Retirement rationale<textarea rows={2} maxLength={1000} value={notes[latest.id]||''} onChange={e=>setNotes(p=>({...p,[latest.id]:e.target.value}))} placeholder="Explain why you want to stop testing this candidate..."/></label>
+       <button className="secondary" disabled={busy||(notes[latest.id]||'').trim().length<8} onClick={()=>void submit({action:'retire',experimentId:latest.id,note:notes[latest.id],confirmation:'RETIRE SHADOW EXPERIMENT'},'Experiment retired; the live paper strategy remains unchanged.')}>Retire shadow experiment</button>
+      </details>}
       {(latest.status==='active'&&latest.comparison.eligible||latest.status==='promoted')&&<div className="arena-evolution-approval">
        <label>Decision rationale (required)
         <textarea rows={2} maxLength={1000} placeholder="Describe evidence, limitations, and why you approve this change..." value={notes[latest.id]||''} onChange={e=>setNotes(p=>({...p,[latest.id]:e.target.value}))}/>
        </label>
-       {latest.status==='active'?<button className="primary" disabled={busy||(notes[latest.id]||'').trim().length<8} onClick={()=>void submit({action:'promote',experimentId:latest.id,note:notes[latest.id],confirmation:'PROMOTE PAPER STRATEGY'},'Version promoted for future Season 1 paper buys only.')}>Approve paper promotion</button>:
+       {latest.status==='active'?<><button className="primary" disabled={busy||(notes[latest.id]||'').trim().length<8} onClick={()=>void submit({action:'promote',experimentId:latest.id,note:notes[latest.id],confirmation:'PROMOTE PAPER STRATEGY'},'Version promoted for future Season 1 paper buys only.')}>Approve paper promotion</button>
+       <button className="secondary" disabled={busy||(notes[latest.id]||'').trim().length<8} onClick={()=>void submit({action:'retire',experimentId:latest.id,note:notes[latest.id],confirmation:'RETIRE SHADOW EXPERIMENT'},'Candidate retired without changing the live strategy.')}>Retain baseline / retire candidate</button></>:
        <button className="secondary" disabled={busy||(notes[latest.id]||'').trim().length<8||ctrl?.active_version_id!==latest.candidate_version_id} onClick={()=>void submit({action:'rollback',experimentId:latest.id,note:notes[latest.id],confirmation:'ROLL BACK PAPER STRATEGY'},'Previous paper sizing version restored for future decisions.')}>Rollback to baseline</button>}
       </div>}
      </div>}
