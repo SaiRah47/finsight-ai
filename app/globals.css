@@ -648,3 +648,32 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .arena-learning-coverage p{font-size:10px;color:#a9b6ce;line-height:1.6}
 @media(max-width:780px){.arena-learning-grid{grid-template-columns:1fr}}
 @media(max-width:500px){.arena-learning{padding:13px}.arena-learning-stats strong{font-size:13px}}
+
+/* Phase 8 shadow tournaments and explicit paper-version approvals */
+.arena-evolution{display:grid;gap:14px;padding:19px;border-radius:18px;background:linear-gradient(142deg,#20223b,#13202e);border:1px solid #87e4e82e}
+.arena-evolution-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.arena-evolution-guide>div{border:1px solid #ffffff28;border-radius:11px;background:#ffffff09;padding:11px;display:flex;align-items:center;gap:8px}
+.arena-evolution-guide strong{color:#a8ecdc;font-size:12px}.arena-evolution-guide span{color:#d1d5e6;font-size:10px}
+.arena-evolution-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.arena-evolution-card{border:1px solid #ffffff25;border-radius:15px;padding:17px;background:#0f192b;display:grid;gap:13px}
+.arena-evolution-card>.atlas-hint{margin:0}
+.arena-evolution-create{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
+.arena-evolution-create label,.arena-evolution-approval label{display:grid;gap:7px;font-size:11px;color:#aebcda}
+.arena-evolution-create select,.arena-evolution-approval textarea{width:100%;border:1px solid #ffffff2e;border-radius:10px;padding:10px;background:#121d33;color:#e8e4fa;font-size:12px;min-width:0}
+.arena-evolution-current{display:grid;gap:12px;border-top:1px solid #ffffff1b;padding-top:13px}
+.arena-evolution-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.arena-evolution-header strong{font-size:14px;color:#e0dcf9}.arena-evolution-header span{font-size:10px;color:#a7eddf}
+.arena-evolution-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.arena-evolution-kpis>div{display:grid;gap:6px;padding:12px;border-radius:10px;background:#202642}
+.arena-evolution-kpis small{font-size:10px;color:#a5b3d2}
+.arena-evolution-kpis strong{font-size:17px;color:#d9f1ee}
+.arena-evolution-reason{font-size:10px;color:#b4c0db;line-height:1.7;margin:0}
+.arena-evolution-history{border:1px solid #ffffff20;border-radius:10px;padding:10px}
+.arena-evolution-history summary{font-size:11px;cursor:pointer;color:#c9c1ed}
+.arena-evolution-history div{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:10px;color:#bac8e0;border-bottom:1px solid #ffffff14}
+.arena-evolution-approval{display:grid;gap:10px;background:#9de7da0c;border:1px solid #9de7da45;border-radius:12px;padding:12px}
+.arena-evolution-log{padding:14px;border-radius:12px;border:1px solid #ffffff24}
+.arena-evolution-log summary{font-size:12px;color:#dbd5ef;cursor:pointer}
+.arena-evolution-log p{font-size:10px;color:#aeb9d3;line-height:1.65}
+@media(max-width:850px){.arena-evolution-grid{grid-template-columns:1fr}.arena-evolution-guide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:450px){.arena-evolution{padding:12px}.arena-evolution-create{grid-template-columns:1fr}.arena-evolution-kpis strong{font-size:14px}}
