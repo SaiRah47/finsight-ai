@@ -13,7 +13,7 @@ export default function ResearchBriefing({report}:{report:ResearchReport}){
   {report.audit.length>0&&<div className="research-claim-review"><h3>Claim-level screening</h3><p>Automated checks can flag missing citations, unsupported numbers, and low evidence overlap. They cannot establish whether prose is true. Review flagged claims against original documents.</p>
    <div className="research-claim-stats"><span>{report.auditSummary.claims} screened</span><span>{report.auditSummary.unsupported} flagged</span><span>{report.auditSummary.needsReview} require review</span></div>
    {report.audit.map((item,i)=><div className="research-claim" key={i}><p>{item.claim}</p><small>{item.status} · {item.reasons.join(' ')}</small>
-    <EvidenceReview kind="claim" question={report.question} excerpt={item.claim} symbol={report.symbol} sourceUrl={report.sources.find(s=>item.supportingIds.includes(s.id))?.url||null}/>
+    <EvidenceReview kind="claim" question={report.question} excerpt={item.claim} symbol={report.symbol} sourceUrl={report.sources.find(s=>item.supportingIds.includes(s.id)&&s.url.startsWith('https://www.sec.gov/Archives/edgar/data/'))?.url||null}/>
    </div>)}
   </div>}
   <section className="research-brief-section"><h3>Primary evidence sources</h3>

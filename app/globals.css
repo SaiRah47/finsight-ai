@@ -477,3 +477,10 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .quality-node strong{color:#d7cff8}
 @media(max-width:900px){.quality-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.quality-node{grid-template-columns:1fr 1fr;gap:7px}.quality-panels{grid-template-columns:1fr}}
 @media(max-width:500px){.research-briefing{padding:14px}.quality-metrics{grid-template-columns:1fr 1fr}}
+
+/* Filing coverage diagnostic is explicit and not an accuracy score. */
+.sec-coverage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sec-coverage-grid>div{display:grid;gap:5px;padding:11px;border:1px solid #ffffff21;border-radius:12px;background:#101929}
+.sec-coverage-grid strong{font-size:11px;color:#cbd1ee}
+.sec-coverage-grid span{font-size:10px;color:#91bfbf;line-height:1.5}
+@media(max-width:700px){.sec-coverage-grid{grid-template-columns:1fr}}

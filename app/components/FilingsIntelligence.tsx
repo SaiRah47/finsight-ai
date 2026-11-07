@@ -5,7 +5,7 @@ import EvidenceReview from './EvidenceReview';
 type Filing={id:string;form:string;filed:string;reportDate:string|null;url:string;description:string};
 type Fact={id:string;label:string;value:number;unit:string;end:string;filed:string;form:string;url:string};
 type Passage={id:string;section:string;text:string;score:number;matchedTerms:string[];start:number;form:string;filed:string;url:string;accession:string};
-type PassageData={passages:Passage[];attempted:number;warnings:string[];retrievalMethod:string};
+type PassageData={passages:Passage[];attempted:number;warnings:string[];retrievalMethod:string;durationMs:number;coverage:{accession:string;form:string;filed:string;complete:boolean;bytesRead:number;maxBytes:number;textCharacters:number;sections:number;extractionTruncated:boolean;passagesFound:number;fetchMs:number}[]};
 type SEC={symbol:string;name:string;cik:string;filings:Filing[];facts:Fact[];source:'SEC EDGAR';fetchedAt:string;warnings:string[]};
 
 const safeLink=(url:string)=>url.startsWith('https://www.sec.gov/Archives/edgar/data/')?url:null;
@@ -68,6 +68,7 @@ export default function FilingsIntelligence({onResearch}:{onResearch?:(question:
    {passageBusy&&<div className="market-skeleton" style={{height:125}} role="status" aria-label="Retrieving filing passages"/>}
    {passageError&&<div className="market-alert" role="alert">{passageError}</div>}
    {passageData&&<div className="sec-passages"><h4>{passageData.passages.length} relevant passages from {passageData.attempted} attempted filings</h4>
+    <div className="sec-coverage-grid">{(passageData.coverage||[]).map(c=><div key={c.accession}><strong>{c.form} · {c.filed}</strong><span>{c.complete?'Extracted within limits':'Partial coverage'} · {Math.round(c.bytesRead/1024)} KB · {c.sections} section markers · {c.fetchMs}ms</span></div>)}</div>
     {passageData.passages.map((passage,i)=><article key={passage.accession+'-'+passage.start}>
      <div className="sec-passage-head"><span>{i+1}. {passage.form} · {passage.filed}</span><span>{passage.section}</span></div>
      <div className="sec-match-metadata"><span>Keyword relevance: {passage.score.toFixed(2)}</span><span>Matched terms: {passage.matchedTerms.length?passage.matchedTerms.slice(0,8).join(', '):'none'}</span></div>

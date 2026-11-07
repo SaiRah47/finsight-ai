@@ -1,5 +1,6 @@
 import 'server-only';
 import {assessEvidence} from './evidence-validation';
+import {auditClaims} from './claim-evaluation';
 
 export type ResearchSource={id:string;label:string;url:string;date:string|null;type:'sec-filing'|'market-provider'};
 export type ResearchNodeEvent={step:string;status:'running'|'complete'|'unavailable'|'error';durationMs?:number;sourceCount?:number;at:string};
@@ -25,6 +26,8 @@ export async function synthesizeOptional(question:string,evidence:string[],sourc
   // Source-ID and coverage gate. This is not a semantic factual-entailment guarantee.
   const assessment=assessEvidence(raw,sources);
   if(!assessment.passesStructuralGate)return {text:null,mode:'deterministic',reason:'Model citations missing or unverified. Using deterministic answer.'};
+  const screened=auditClaims(raw,sources,evidence);
+  if(screened.some(row=>row.status==='unsupported'))return {text:null,mode:'deterministic',reason:'Model output contains claims not supported by available citation and lexical/numeric screening.'};
   return {text:raw,mode:'llm',reason:'Optional model drafted a narrative from retrieved evidence; independently verify all claims.'};
  }catch{return {text:null,mode:'deterministic',reason:'Optional model request failed; using verifiable evidence.'}}
 }
