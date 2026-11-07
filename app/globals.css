@@ -586,3 +586,5 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .monitor-run strong{color:#dfd5fa}
 .monitor-run small{font-size:10px;color:#f4c393}
 @media(max-width:850px){.monitor-grid{grid-template-columns:1fr}}
+
+.monitor-run-details{flex-basis:100%;font-size:10px;color:#e7bd91;line-height:1.6}.monitor-run-details summary{cursor:pointer}.monitor-run-details p{margin:8px 0 0;overflow-wrap:anywhere}

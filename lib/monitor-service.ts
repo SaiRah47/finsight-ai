@@ -47,12 +47,13 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
   const active=(rules||[]).map(r=>({id:String(r.id),symbol:String(r.symbol),metric:r.metric as AlertMetric,threshold:Number(r.threshold),enabled:Boolean(r.enabled)}));
   // Bound daily market provider work: up to three distinct symbols, no more than 2 concurrent calls.
   const symbols=[...new Set(active.map(r=>r.symbol))].slice(0,3);
-  symbolCount=symbols.length;
+  symbolCount=0;
   const {data:prior,error:priorError}=await db.from('monitor_rule_state').select('rule_id,triggered').eq('user_id',userId);
   if(priorError)throw Error('Rule-state query unavailable: '+priorError.message);
   const previous=new Map((prior||[]).map(x=>[String(x.rule_id),Boolean(x.triggered)]));
   for(const symbol of symbols){
    if(Date.now()-startedAt>30_000){errors.push('Daily market scan stopped at 30-second soft budget; remaining symbols deferred.');break}
+   symbolCount++;
    const selected=active.filter(r=>r.symbol===symbol);
    const historical=selected.some(r=>r.metric==='volatility_above'||r.metric==='volume_ratio_above');
    const observation:AlertObservation={symbol,price:null,changePercent:null,volatility20:null,volumeRatio:null,asOf:null};

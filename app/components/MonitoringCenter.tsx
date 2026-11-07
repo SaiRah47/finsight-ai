@@ -81,7 +81,7 @@ export default function MonitoringCenter(){
   </div>
   <div className="atlas-phase6-panel"><h3>Scheduled run history</h3>
    {!data?.runs.length&&<p className="muted">No scheduled runs have been recorded.</p>}
-   <div className="monitor-run-list">{data?.runs.map(run=><div className="monitor-run" key={run.id}><strong>{run.run_day}</strong><span>{run.status}</span><span>{run.symbols_scanned} symbols</span><span>{run.events_created} events</span>{run.error_text&&<small title={run.error_text}>Provider/data limitations recorded</small>}</div>)}</div>
+   <div className="monitor-run-list">{data?.runs.map(run=><div className="monitor-run" key={run.id}><strong>{run.run_day}</strong><span>{run.status}</span><span>{run.symbols_scanned} symbols</span><span>{run.events_created} events</span>{run.error_text&&<details className="monitor-run-details"><summary>Provider/data limitations</summary><p>{run.error_text}</p></details>}</div>)}</div>
   </div>
   <p className="atlas-disclaimer">{data?.disclaimer||'Monitoring requires an owner-authenticated Supabase migration, Vercel secrets and explicit opt-in.'} This is a daily polling prototype, not autonomous trading or guaranteed real-time market surveillance.</p>
  </section>;
