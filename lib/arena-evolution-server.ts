@@ -161,3 +161,14 @@ export async function changeStrategy(owner:string,experimentId:string,action:'pr
  if(error)throw Error('Atomic version transition rejected: '+error.message);
  return {changed:true,action,changeId:data,note:'Only future investor-cycle order sizing will change. Existing cash, holdings and order history are untouched.'};
 }
+
+/** Retire a losing/inconclusive shadow tournament without touching the live strategy. */
+export async function retireShadowExperiment(owner:string,experimentId:string,note:string){
+ if(note.trim().length<8||note.trim().length>1000)throw Error('Explain why this shadow experiment is being retired (8–1000 characters).');
+ const db=database();
+ const {data,error}=await db.from('arena_shadow_experiments')
+  .update({status:'retired',finished_at:new Date().toISOString(),retirement_note:note.trim()})
+  .eq('id',experimentId).eq('user_id',owner).eq('status','active').select('id').maybeSingle();
+ if(error||!data)throw Error('No active shadow tournament was retired. It may already be closed.');
+ return {retired:true,id:data.id,note:'The live strategy version, balances and order ledger were not changed.'};
+}
