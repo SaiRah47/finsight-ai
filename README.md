@@ -74,3 +74,7 @@ Four investor strategy baselines and three paused intraday trader personas each 
 ### Agent learning lab — controlled, observational self-review
 
 Arena includes immutable quote-dated paper equity captures, per-agent descriptive performance reviews, and explicitly **research-only** proposed risk-sizing experiments. No agents silently rewrite strategies or seek unbounded profit optimization; actual parameter promotion requires prospective out-of-sample evaluation and approval. Apply `supabase/migrations/202611070006_phase8_agent_learning.sql` separately. Details in [Phase 8](docs/PHASE_8.md).
+
+### Strategy Evolution — versioned shadow competitions
+
+Phase 8 now includes two independent $5,000 forward-paper shadow books per investor experiment, allocation-cap challenger versions, source-dated paired observations, gated return/drawdown comparisons, explicit owner promotion/rollback, and experiment retirement. **No AI agent silently changes its strategy or trades real money.** Apply `supabase/migrations/202611070007_phase8_shadow_tournaments.sql` in Supabase and open **Agent arena → Strategy Evolution Arena**. See the [evolution runbook](docs/PHASE_8_EVOLUTION.md).
