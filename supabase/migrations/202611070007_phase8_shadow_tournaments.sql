@@ -33,6 +33,8 @@ create table if not exists public.arena_shadow_experiments(
  retirement_note text check(retirement_note is null or char_length(retirement_note) between 8 and 1000),
  check(baseline_version_id<>candidate_version_id)
 );
+-- Handles partial early installations of this new migration without losing existing experiment rows.
+alter table public.arena_shadow_experiments add column if not exists retirement_note text;
 create unique index if not exists arena_one_active_shadow_per_agent
  on public.arena_shadow_experiments(agent_id) where status='active';
 create table if not exists public.arena_shadow_steps(
