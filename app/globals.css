@@ -394,3 +394,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .sec-passages article a{font-size:11px;color:#87e4e8;text-decoration:underline}
 .sec-passages details{font-size:11px;color:#aeb6d3}
 @media(max-width:700px){.sec-passage-search button{width:100%}}
+
+/* SEC retrieval diagnostics. These are relevance signals, never probability estimates. */
+.sec-match-metadata{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:#9cacc8;line-height:1.6}
+.sec-match-metadata span:first-child{color:#93e4dd}

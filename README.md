@@ -46,3 +46,7 @@ The Markets tab now includes US equity symbol search, server-side quotes, six se
 ## Milestone 4 — SEC research intelligence
 
 FinSight now includes a dedicated SEC EDGAR filings view, first-party issuer CIK lookup, recent 10-K/10-Q/8-K filing links, and selected XBRL financial facts. Its LangGraph workflow combines filing metadata with historical market risk where the question warrants it, displays timed node execution and verified source links, and saves results to Supabase. AI prose synthesis is optional and disabled by default. **SEC access requires an application-specific User-Agent with a real contact email configured only in Vercel**. See [Milestone 4 setup and limitations](docs/SEC_RESEARCH.md).
+
+### Retrieval-quality regression suite
+
+Milestone 4 includes a synthetic SEC-style labeled benchmark with Hit@1, Recall@3, MRR, and a limited false-positive measure. It runs in GitHub Actions and uploads the case-level report as an artifact. These are **synthetic regression checks, not verified performance on real filings**. See [evaluation methodology](docs/RETRIEVAL_EVALUATION.md).

@@ -64,3 +64,6 @@ Never use a `NEXT_PUBLIC_` prefix for these keys. Don't paste them into chat or 
 - The LangGraph filings/combined routes attempt passage retrieval; when blocked/oversized/no match, return metadata plus a limitation message instead of inventing filing narrative.
 - Optional AI synthesis consumes bounded excerpts as **untrusted input**, with verified citations required to accept an AI answer. This is basic citation validation, not a claim of complete factual verification.
 - Future work: HTML-native table extraction, robust heading hierarchy, typed exhibit attachments, embeddings and retrieval quality evaluation on a labeled dataset.
+
+## Quality evaluation and visible ranking diagnostics
+The SEC passage viewer displays lexical ranking scores and matched terms to aid debugging; scores are not confidence probabilities. A synthetic labeled retrieval benchmark now runs on every commit and archives a per-case CI report. See [retrieval evaluation](RETRIEVAL_EVALUATION.md) for exact definitions, regression gates and limitations.

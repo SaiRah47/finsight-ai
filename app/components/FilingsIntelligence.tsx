@@ -2,7 +2,7 @@
 import {useState} from 'react';
 type Filing={id:string;form:string;filed:string;reportDate:string|null;url:string;description:string};
 type Fact={id:string;label:string;value:number;unit:string;end:string;filed:string;form:string;url:string};
-type Passage={id:string;section:string;text:string;score:number;start:number;form:string;filed:string;url:string;accession:string};
+type Passage={id:string;section:string;text:string;score:number;matchedTerms:string[];start:number;form:string;filed:string;url:string;accession:string};
 type PassageData={passages:Passage[];attempted:number;warnings:string[];retrievalMethod:string};
 type SEC={symbol:string;name:string;cik:string;filings:Filing[];facts:Fact[];source:'SEC EDGAR';fetchedAt:string;warnings:string[]};
 
@@ -68,6 +68,7 @@ export default function FilingsIntelligence({onResearch}:{onResearch?:(question:
    {passageData&&<div className="sec-passages"><h4>{passageData.passages.length} relevant passages from {passageData.attempted} attempted filings</h4>
     {passageData.passages.map((passage,i)=><article key={passage.accession+'-'+passage.start}>
      <div className="sec-passage-head"><span>{i+1}. {passage.form} · {passage.filed}</span><span>{passage.section}</span></div>
+     <div className="sec-match-metadata"><span>Keyword relevance: {passage.score.toFixed(2)}</span><span>Matched terms: {passage.matchedTerms.length?passage.matchedTerms.slice(0,8).join(', '):'none'}</span></div>
      <p>{passage.text.length>800?passage.text.slice(0,800)+'…':passage.text}</p>
      {safeLink(passage.url)&&<a href={passage.url} target="_blank" rel="noreferrer">Read original SEC filing ↗</a>}
     </article>)}
