@@ -58,3 +58,7 @@ In the SEC filings tab, the **Real SEC retrieval lab** runs bounded, owner-only 
 ## Phase 5 — research quality engineering
 
 The app now includes extended bounded SEC ingestion, per-filing extraction diagnostics, structured research reports, conservative citation/number screening, a private human-review queue with Supabase RLS, and a Quality Lab showing saved-trace timings and review diagnostics. To enable saving user review labels, apply the SQL migration `supabase/migrations/202611070002_phase5_evaluations.sql` in Supabase. The 36 candidate prompts are *unlabeled*; no independently reviewed 30–50-case ground truth is claimed. Read the [Phase 5 runbook](docs/PHASE_5.md).
+
+## Phase 6 — Holdings, Alerts, Journal and Intelligence Hub
+
+Phase 6 introduces owner-only **manually entered portfolio holdings**, quote-grounded USD allocation and concentration analysis, optional historical fixed-weight portfolio volatility, **on-demand** watchlist alert threshold checks, an on-demand SEC-filing recency feed, an investment research journal, and an Overview intelligence hub. Continuous alerts, trades and brokerage connections are **not** implemented. Apply the SQL migration `supabase/migrations/202611070003_phase6_portfolio_alerts_journal.sql` in Supabase to activate private data writes. See the [Phase 6 guide](docs/PHASE_6.md).
