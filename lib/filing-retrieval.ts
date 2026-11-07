@@ -8,7 +8,7 @@ export type FilingPassage={
 };
 export type FilingDocument={text:string;sections:{heading:string;start:number;end:number}[];truncated:boolean};
 const CAP=840_000;
-const MAX_CHUNKS=900;
+const MAX_CHUNKS=1200;
 function decodeEntities(raw:string):string{
  return raw.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp|ndash|mdash|rsquo|lsquo);/gi,(value,body:string)=>{
   const names:Record<string,string>={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',ndash:'–',mdash:'—',rsquo:"'",lsquo:"'"};
@@ -62,15 +62,18 @@ export function makeChunks(doc:FilingDocument):FilingPassage[]{
  const result:FilingPassage[]=[];const span=1100,overlap=180;
  let start=0;
  while(start<doc.text.length&&result.length<MAX_CHUNKS){
-  let end=Math.min(start+span,doc.text.length);
-  if(end<doc.text.length){
+  // A passage must not cross a recognized SEC section boundary.
+  const nextSection=doc.sections.find(section=>section.start>start)?.start??doc.text.length;
+  let end=Math.min(start+span,doc.text.length,nextSection);
+  if(end<doc.text.length&&end!==nextSection){
    const breakAt=Math.max(doc.text.lastIndexOf('\n',end),doc.text.lastIndexOf('. ',end));
    if(breakAt>start+650)end=breakAt+1;
   }
+  if(end<=start){start++;continue}
   const raw=doc.text.slice(start,end).trim();
   if(raw.length>100)result.push({id:'P'+(result.length+1),section:headingAt(start,doc),text:raw,start,end,score:0,matchedTerms:[]});
   if(end===doc.text.length)break;
-  start=Math.max(start+1,end-overlap);
+  start=end===nextSection?end:Math.max(start+1,end-overlap);
  }
  return result;
 }
