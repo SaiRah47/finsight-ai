@@ -62,3 +62,7 @@ The app now includes extended bounded SEC ingestion, per-filing extraction diagn
 ## Phase 6 — Holdings, Alerts, Journal and Intelligence Hub
 
 Phase 6 introduces owner-only **manually entered portfolio holdings**, quote-grounded USD allocation and concentration analysis, optional historical fixed-weight portfolio volatility, **on-demand** watchlist alert threshold checks, an on-demand SEC-filing recency feed, an investment research journal, and an Overview intelligence hub. Continuous alerts, trades and brokerage connections are **not** implemented. Apply the SQL migration `supabase/migrations/202611070003_phase6_portfolio_alerts_journal.sql` in Supabase to activate private data writes. See the [Phase 6 guide](docs/PHASE_6.md).
+
+## Phase 7 — Secure daily monitoring and opt-in notifications
+
+Phase 7 adds a secret-protected Vercel daily cron route, owner-only monitoring preferences, a persistent run audit, stateful/deduplicated price and filing alerts, an in-app inbox, and optional email delivery via Resend. Nothing scans in the background until the Phase 7 Supabase migration and **server-only** scheduler secrets are configured, and the owner explicitly enables monitoring. Daily provider and scan caps limit free-tier usage; this is not real-time monitoring or automated trading. See [Phase 7 activation and limitations](docs/PHASE_7.md).
