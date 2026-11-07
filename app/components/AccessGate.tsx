@@ -135,7 +135,7 @@ export default function AccessGate({children}:{children:ReactNode}){
    <button className="primary" disabled={sending}>{sending?(method==='password'?'Signing in…':'Sending link…'):(method==='password'?'Sign in securely ↗':'Send sign-in link ↗')}</button>
   </form>
   <p className="access-hint">{method==='password'?'New to password login? Sign in once using Email link, then open your account menu to set a password.':'Magic links are limited by Supabase email quotas. Password sign-in sends no email.'}</p>
- </>
+ </>}
  {(status==='denied'||status==='setup')&&<button className="secondary" onClick={()=>void logout()}>Sign out</button>}
  {message&&<p role="status" className="access-message">{message}</p>}
  <small>Personal workspace · Secure account access · No brokerage connectivity</small></div></main>;
