@@ -66,10 +66,18 @@ export async function runInvestorCycle(owner:string):Promise<{cycleDate:string;o
    if(quote.currency!=='USD'||quote.price<=0||!observation)throw Error('USD quote or observation date unavailable.');
    const session=eligiblePaperQuote(new Date(),observation);
    if(!session.eligible)throw Error(session.reason);
-   // Investor agents deliberately do not use intraday data, unvalidated forecasts or leverage.
-   const sizing=calculatePaperBuy(Number(agent.cash),quote.price,0.20,10,0);
+   // Read a promoted version's sizing parameter when available. Prior migration stays backwards-compatible.
+   let allocation=0.20,version=1;
+   const active=await db.from('arena_strategy_control').select('active_version_id').eq('agent_id',agent.id).eq('user_id',owner).maybeSingle();
+   if(!active.error&&active.data?.active_version_id){
+    const chosen=await db.from('arena_strategy_versions').select('allocation,version').eq('id',active.data.active_version_id).eq('agent_id',agent.id).single();
+    if(chosen.error||!chosen.data)throw Error('Active strategy parameters could not be loaded.');
+    allocation=Number(chosen.data.allocation);version=Number(chosen.data.version);
+   }
+   // The existing virtual account remains intact; only FUTURE order-sizing decisions change.
+   const sizing=calculatePaperBuy(Number(agent.cash),quote.price,allocation,10,0);
    if(!sizing)throw Error('Insufficient virtual cash for one whole-share position under sizing limits.');
-   reason='Strategy universe rotation; buys up to 20% of initial virtual capital at a quote plus 10bps modeled slippage. No valuation/momentum forecast is claimed.';
+   reason='Strategy v'+version+' universe rotation; buys up to '+(allocation*100).toFixed(0)+'% of initial virtual capital at a quote plus 10bps modeled slippage. No valuation/momentum forecast is claimed.';
    evidence='Twelve Data '+symbol+' quote '+quote.price+' USD, provider observation '+quote.asOf+', fetched '+quote.fetchedAt;
    const {data:order,error:tradeError}=await db.rpc('arena_execute_virtual_order',{
     p_agent:agent.id,p_owner:owner,p_request_key:'season1:'+cycleDate+':'+agent.slug+':'+symbol,
