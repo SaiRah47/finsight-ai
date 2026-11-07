@@ -326,3 +326,48 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .radar-study-grid strong{font-size:17px;color:#e7e5fa}
 .radar-study p{font-size:9px;color:#9096b8;line-height:1.6;margin:13px 0 0}
 .radar-no-events{font-size:11px!important;color:#c4bddd!important}
+
+/* Official SEC EDGAR / filings intelligence */
+.sec-intelligence{display:grid;gap:19px;padding-bottom:30px}
+.sec-hero{display:flex;justify-content:space-between;align-items:end;gap:18px}
+.sec-hero h2{font-size:clamp(29px,4.8vw,52px);letter-spacing:-.055em;margin:11px 0}
+.sec-hero p{font-size:12px;color:#a8acc8;line-height:1.8;max-width:650px}
+.sec-provider,.sec-trust-pill{border:1px solid #92ddd950;border-radius:999px;color:#9ce9df;background:#87e4e812;padding:10px 13px;font-size:10px;white-space:nowrap}
+.sec-controls{border:1px solid #ffffff20;background:#1b1c32d6;border-radius:19px;padding:21px;display:grid;gap:10px}
+.sec-controls label{font-size:11px;color:#b8bbd5}
+.sec-controls>div{display:flex;gap:10px;max-width:650px}
+.sec-controls input{flex:1;min-width:0;border:1px solid #ffffff35;border-radius:12px;padding:12px 15px;background:#0e1121;color:#f5f2ff}
+.sec-controls p{font-size:10px;color:#9299b8;margin:0}
+.sec-empty{display:grid;justify-items:center;text-align:center;gap:6px;border:1px dashed #ffffff36;border-radius:20px;padding:44px 20px}
+.sec-empty span{font-size:42px;color:#b8a6ff}.sec-empty h3{margin:0}.sec-empty p{font-size:12px;color:#9fa5c2;max-width:480px;line-height:1.7}
+.sec-loading{display:grid;gap:14px;font-size:12px;color:#a3a8c2}
+.sec-company-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #87e4e82a;background:linear-gradient(120deg,#24203e,#172a31);border-radius:18px;padding:22px}
+.sec-company-banner>div>span{font-size:10px;letter-spacing:.12em;color:#a7c9cf}.sec-company-banner h3{font-size:24px;margin:8px 0}.sec-company-banner p{font-size:11px;color:#b2bad1}
+.sec-section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
+.sec-section-head h3{font-size:18px;margin:0}.sec-section-head small{font-size:10px;color:#9ea5c3}
+.sec-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sec-fact{display:grid;gap:10px;border:1px solid #ffffff1b;border-radius:16px;background:#191b2f;padding:20px}
+.sec-fact small{color:#a9acc9}.sec-fact strong{font-size:27px;letter-spacing:-.04em}.sec-fact span{font-size:10px;color:#a6b0cb}
+.sec-fact a{font-size:11px;color:#87e4e8;text-decoration:underline}
+.sec-muted-box{border:1px solid #ffffff1b;padding:17px;border-radius:14px;color:#a8aeca;font-size:12px;line-height:1.7}
+.sec-filters{display:flex;gap:7px;flex-wrap:wrap}.sec-filters button{border:1px solid #ffffff25;border-radius:999px;background:#ffffff09;padding:9px 15px;color:#a8abc6;font-size:11px}
+.sec-filters button.active{background:linear-gradient(120deg,#b8a6ff,#87e4e8);color:#17162b}
+.sec-filing-list{border:1px solid #ffffff18;border-radius:18px;background:#17192e;overflow:hidden}
+.sec-filing-row{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #ffffff13}
+.sec-filing-row:last-child{border:0}.sec-filing-row:hover{background:#b8a6ff11}
+.sec-form-pill{border:1px solid #b8a6ff55;color:#cfbbff;background:#b8a6ff14;border-radius:10px;padding:8px 11px;min-width:60px;text-align:center;font-size:12px;font-weight:700}
+.sec-filing-name{display:grid;gap:6px;min-width:0;flex:1}.sec-filing-name strong{font-size:12px;overflow-wrap:anywhere}.sec-filing-name small{font-size:10px;color:#999fb8}
+.sec-filing-open{font-size:11px;color:#89e1dc;white-space:nowrap}
+.sec-research-action{justify-self:start}.sec-caveats{font-size:11px;color:#a6a8c8;border:1px solid #ffffff17;border-radius:13px;padding:13px}
+.sec-caveats summary{cursor:pointer;font-weight:700}.sec-caveats p{line-height:1.6}
+.sec-disclaimer{font-size:10px;color:#8e96b4;line-height:1.75}
+.research-sources{margin-top:16px;display:grid;gap:8px;background:#101428;border:1px solid #ffffff1c;border-radius:14px;padding:15px}
+.research-sources h3{font-size:12px;margin:0 0 5px}.research-sources a{display:flex;align-items:center;gap:9px;font-size:11px;color:#c7c9e2;border:1px solid #ffffff18;border-radius:9px;padding:10px;flex-wrap:wrap}
+.research-sources a:hover{border-color:#87e4e88a}.research-sources a>span{color:#87e4e8;font-weight:700}
+.research-sources a strong{font-weight:600;flex:1}.research-sources a small{color:#929bb9}
+@media(max-width:700px){.mobile-nav{grid-template-columns:repeat(6,minmax(0,1fr))}.mobile-nav .mobile-label{font-size:8px}
+ .sec-hero,.sec-company-banner,.sec-section-head{display:block}
+ .sec-provider,.sec-trust-pill{display:inline-flex;margin-top:9px}
+ .sec-controls>div{flex-wrap:wrap}.sec-controls button{width:100%}
+ .sec-facts{grid-template-columns:1fr}.sec-filing-row{padding:14px 11px;gap:9px}.sec-filing-open{font-size:9px}
+}

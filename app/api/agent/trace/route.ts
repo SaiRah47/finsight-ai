@@ -2,6 +2,7 @@ import {z} from 'zod';
 import {runDemoResearch} from '@/lib/agent';
 import {authorizedOwner} from '@/lib/supabase/server';
 import {supabaseConfigured} from '@/lib/supabase/config';
+
 export const runtime='nodejs';
 const schema=z.object({question:z.string().trim().min(3).max(500)});
 export async function POST(request:Request){
@@ -19,23 +20,25 @@ export async function POST(request:Request){
   };
   void(async()=>{
    try{
-    send('trace',{executionId,step:'router',status:'running',at:new Date().toISOString()});
-    const result=await runDemoResearch(parsed.data.question);
-    send('trace',{executionId,step:'router',status:'complete',route:result.route,at:new Date().toISOString()});
-    send('trace',{executionId,step:result.route,status:result.source==='market-data'?'complete':'unavailable',source:result.source,symbol:result.symbol,asOf:result.asOf,evidenceCount:result.evidence?.length??0,at:new Date().toISOString()});
-    send('trace',{executionId,step:'synthesize',status:'complete',at:new Date().toISOString()});
+    const result=await runDemoResearch(parsed.data.question,ev=>send('trace',{executionId,...ev}));
+    const sources=result.sources.slice(0,10).map((s,i)=>({...s,id:'S'+(i+1)}));
     let persisted=false;
     if(owner){
+     send('trace',{executionId,step:'persistence',status:'running',at:new Date().toISOString()});
      const {data:run,error}=await owner.db.from('research_runs').insert({user_id:owner.user.id,question:parsed.data.question,route:result.route,answer:result.answer}).select('id').single();
-     if(error){send('trace',{executionId,step:'persistence',status:'error',message:'Research could not be saved.'})}
-     else if(run){
-      const {error:traceError}=await owner.db.from('execution_traces').insert({user_id:owner.user.id,run_id:run.id,events:traceEvents});
+     if(error){
+      send('trace',{executionId,step:'persistence',status:'error',message:'Research could not be saved.',at:new Date().toISOString()});
+     }else if(run){
+      const {error:traceError}=await owner.db.from('execution_traces').insert({user_id:owner.user.id,run_id:run.id,events:[...traceEvents]});
       persisted=!traceError;
-      send('trace',{executionId,step:'persistence',status:persisted?'complete':'error'});
+      send('trace',{executionId,step:'persistence',status:persisted?'complete':'error',at:new Date().toISOString()});
      }
     }
-    send('result',{executionId,answer:result.answer,mode:result.source==='market-data'?'provider-backed':'limited',source:result.source,symbol:result.symbol,asOf:result.asOf,persisted});
-   }catch{send('error',{message:'Workflow failed'});}finally{controller.close()}
+    send('result',{executionId,answer:result.answer,mode:result.synthesisMode==='llm'?'ai-assisted':'evidence-only',
+     route:result.route,source:result.source,symbol:result.symbol,asOf:result.asOf,sources,persisted});
+   }catch(error){
+    send('error',{message:'Research workflow failed: '+(error instanceof Error?error.message:'unknown error')});
+   }finally{controller.close()}
   })();
  }});
  return new Response(stream,{headers:{'content-type':'text/event-stream; charset=utf-8','cache-control':'no-store, no-transform','x-content-type-options':'nosniff'}});

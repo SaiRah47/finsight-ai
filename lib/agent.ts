@@ -125,7 +125,7 @@ export function createResearchGraph(progress?:(ev:ResearchNodeEvent)=>void){
   const summary=state.source!=='unavailable'
    ?await synthesizeOptional(state.question,state.evidence,sources)
    :{text:null,mode:'deterministic' as const,reason:'No verified sources available.'};
-  return {sources,answer:(summary.text||fallback)+'\n\nResearch boundaries: dated observations only; no personalized investment advice. See the verified sources below.',
+  return {answer:(summary.text||fallback)+'\n\nResearch boundaries: dated observations only; no personalized investment advice. See the verified sources below.',
    synthesisMode:summary.mode};
  }))
  .addEdge(START,'router')
