@@ -112,3 +112,49 @@ begin
 end $$;
 revoke all on function public.arena_record_shadow_step(uuid,uuid,date,text,numeric,numeric,numeric,jsonb,jsonb,jsonb,jsonb,numeric,numeric) from public,anon,authenticated;
 grant execute on function public.arena_record_shadow_step(uuid,uuid,date,text,numeric,numeric,numeric,jsonb,jsonb,jsonb,jsonb,numeric,numeric) to service_role;
+
+-- Version transitions are atomic, owner-authorized server actions only. Never touch portfolio cash.
+create or replace function public.arena_switch_strategy_version(
+ p_owner uuid,p_experiment uuid,p_action text,p_note text,p_expected uuid,p_next uuid
+) returns uuid
+language plpgsql security definer set search_path=''
+as $$
+declare e public.arena_shadow_experiments%rowtype;
+ c public.arena_strategy_control%rowtype; mark_count integer; change_id uuid;
+begin
+ if auth.role()<>'service_role' then raise exception 'Privileged role required'; end if;
+ if char_length(p_note) not between 8 and 1000 or p_action not in ('promote','rollback') then
+  raise exception 'Invalid transition rationale'; end if;
+ select * into e from public.arena_shadow_experiments
+  where id=p_experiment and user_id=p_owner for update;
+ if not found then raise exception 'Experiment unavailable'; end if;
+ select * into c from public.arena_strategy_control
+  where agent_id=e.agent_id and user_id=p_owner for update;
+ if not found or c.active_version_id is distinct from p_expected then
+  raise exception 'Active version changed; retry review'; end if;
+ if p_action='promote' then
+  if e.status<>'active' or p_expected<>e.baseline_version_id or p_next<>e.candidate_version_id then
+   raise exception 'Invalid promotion state'; end if;
+  select count(*) into mark_count from public.arena_shadow_steps
+   where experiment_id=p_experiment;
+  if mark_count<20 then raise exception 'At least 20 paired observations required'; end if;
+  update public.arena_shadow_experiments set status='promoted',finished_at=now() where id=p_experiment;
+ else
+  if e.status<>'promoted' or p_expected<>e.candidate_version_id or p_next<>e.baseline_version_id
+   or c.previous_version_id is distinct from e.baseline_version_id then
+   raise exception 'Rollback only available for the latest promoted version'; end if;
+  update public.arena_shadow_experiments set status='retired',finished_at=now() where id=p_experiment;
+ end if;
+ perform 1 from public.arena_strategy_versions
+  where id=p_next and agent_id=e.agent_id and user_id=p_owner;
+ if not found then raise exception 'Target version does not belong to the agent'; end if;
+ update public.arena_strategy_control set active_version_id=p_next,
+  previous_version_id=p_expected,updated_at=now()
+  where agent_id=e.agent_id and user_id=p_owner;
+ insert into public.arena_strategy_changes(user_id,agent_id,experiment_id,from_version_id,to_version_id,action,note)
+  values(p_owner,e.agent_id,p_experiment,p_expected,p_next,p_action,p_note)
+  returning id into change_id;
+ return change_id;
+end $$;
+revoke all on function public.arena_switch_strategy_version(uuid,uuid,text,text,uuid,uuid) from public,anon,authenticated;
+grant execute on function public.arena_switch_strategy_version(uuid,uuid,text,text,uuid,uuid) to service_role;
