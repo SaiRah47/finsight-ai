@@ -371,3 +371,12 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
  .sec-controls>div{flex-wrap:wrap}.sec-controls button{width:100%}
  .sec-facts{grid-template-columns:1fr}.sec-filing-row{padding:14px 11px;gap:9px}.sec-filing-open{font-size:9px}
 }
+
+/* Research history: preserve readable answers and official evidence links */
+.research-historical-answer{white-space:pre-wrap;overflow-wrap:anywhere}
+.historical-sources{display:grid;gap:9px;padding:12px 0}
+.historical-sources>strong{font-size:11px;color:#c7bbf2}
+.historical-sources a{font-size:11px;color:#87e4e8;text-decoration:underline;line-height:1.6;overflow-wrap:anywhere}
+.historical-sources a span{font-weight:800}
+.raw-trace{margin-top:10px;border:1px solid #ffffff1b;border-radius:12px;padding:12px}
+.raw-trace>summary{font-size:11px;display:list-item;color:#9ba3c1}

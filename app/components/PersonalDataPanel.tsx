@@ -45,6 +45,20 @@ export default function PersonalDataPanel({mode,onSelectSymbol}:{mode:'watchlist
  {symbols.length===0&&<p className="muted">No saved symbols. Add a ticker to build your personal watchlist.</p>}
  {symbols.map(row=><div className="watchrow" key={row.id}><button className="ticker saved-symbol-link" type="button" onClick={()=>onSelectSymbol?.(row.symbol)} aria-label={'Open '+row.symbol+' price chart'}>{row.symbol} <span aria-hidden="true">↗</span></button><button className="pill" onClick={()=>void remove(row.id)}>Remove</button></div>)}</>:
  <>{runs.length===0&&<p className="muted">No saved research yet. Execute a LangGraph workflow and refresh this panel.</p>}
- {runs.map(run=><details className="history-row" key={run.id}><summary><strong>{run.question}</strong><span>{new Date(run.created_at).toLocaleString()} · {run.route}</span></summary><p>{run.answer}</p><pre>{JSON.stringify(traces.find(t=>t.run_id===run.id)?.events??[],null,2)}</pre></details>)}</>}
+ {runs.map(run=>{
+  const recorded=traces.find(t=>t.run_id===run.id)?.events;
+  const timeline=Array.isArray(recorded)?recorded:[] as unknown[];
+  const evidence=timeline.find((item:unknown)=>item&&typeof item==='object'&&!Array.isArray(item)&&(item as {step?:unknown}).step==='evidence') as {sources?:unknown}|undefined;
+  const links=(Array.isArray(evidence?.sources)?evidence.sources:[]).filter((value:unknown)=>{
+   if(!value||typeof value!=='object'||Array.isArray(value))return false;
+   const url=(value as {url?:unknown}).url;
+   return typeof url==='string'&&(url.startsWith('https://www.sec.gov/Archives/edgar/data/')||url==='https://twelvedata.com');
+  }) as {id:string;url:string;label:string;date:string|null}[];
+  return <details className="history-row" key={run.id}><summary><strong>{run.question}</strong><span>{new Date(run.created_at).toLocaleString()} · {run.route}</span></summary>
+   <p className="research-historical-answer">{run.answer}</p>
+   {links.length>0&&<div className="historical-sources"><strong>Saved evidence sources</strong>{links.map(source=><a href={source.url} target="_blank" rel="noreferrer" key={source.id+source.url}><span>{source.id}</span> {source.label} ↗</a>)}</div>}
+   <details className="raw-trace"><summary>View raw execution events</summary><pre>{JSON.stringify(timeline,null,2)}</pre></details>
+  </details>
+ })}</>}
  {error&&<p className="vault-error" role="alert">{error}</p>}</section>;
 }

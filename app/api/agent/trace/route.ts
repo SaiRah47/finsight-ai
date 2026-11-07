@@ -22,6 +22,7 @@ export async function POST(request:Request){
    try{
     const result=await runDemoResearch(parsed.data.question,ev=>send('trace',{executionId,...ev}));
     const sources=result.sources.slice(0,10).map((s,i)=>({...s,id:'S'+(i+1)}));
+    send('trace',{executionId,step:'evidence',status:sources.length?'complete':'unavailable',sources,sourceCount:sources.length,mode:result.synthesisMode,at:new Date().toISOString()});
     let persisted=false;
     if(owner){
      send('trace',{executionId,step:'persistence',status:'running',at:new Date().toISOString()});
