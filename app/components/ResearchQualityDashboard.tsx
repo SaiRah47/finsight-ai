@@ -1,10 +1,11 @@
 'use client';
 import {useState} from 'react';
 import {REVIEW_PROMPTS} from '@/lib/review-queue';
+type ReviewStats={reviewed:number;supported:number;unsupported:number;uncertain:number;judgedRelevantShare:number|null;topOneJudgedRelevantShare:number|null;decided:number;topOneJudged:number};
 type NodeSummary={node:string;samples:number;p50Ms:number|null;p95Ms:number|null;failures:number};
 type Dashboard={runs:number;traces:number;sourceBearing:number;sourceCoverage:number|null;statuses:Record<string,number>;perNode:NodeSummary[];failures:Record<string,number>;reviews:{count:number;supported:number;unsupported:number;uncertain:number};limitations:string[];generatedAt:string};
 export default function ResearchQualityDashboard(){
- const [data,setData]=useState<Dashboard|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const [data,setData]=useState<Dashboard|null>(null),[reviewStats,setReviewStats]=useState<ReviewStats|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
  const [issuer,setIssuer]=useState<'NVDA'|'MSFT'|'AAPL'>('NVDA'),[copied,setCopied]=useState('');
  async function load(){
   setLoading(true);setError('');
@@ -12,6 +13,8 @@ export default function ResearchQualityDashboard(){
    const response=await fetch('/api/ops/summary',{cache:'no-store'}),json=await response.json();
    if(!response.ok)throw Error(json.error||'Diagnostics unavailable');
    setData(json);
+   const reviewed=await fetch('/api/evaluation/reviews',{cache:'no-store'});
+   if(reviewed.ok){const labeled=await reviewed.json();setReviewStats(labeled.summary?.retrieval||null)}else setReviewStats(null);
   }catch(e){setError(e instanceof Error?e.message:'Diagnostics unavailable')}
   finally{setLoading(false)}
  }

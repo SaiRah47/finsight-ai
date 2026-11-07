@@ -22,10 +22,17 @@ export async function GET(){
  if(error)return Response.json({error:'Evaluation table unavailable. Apply supabase/migrations/202611070002_phase5_evaluations.sql in Supabase.'},{status:503});
  const rows=data||[];
  const retrieval=rows.filter(r=>r.kind==='retrieval'),claims=rows.filter(r=>r.kind==='claim');
- const counts=(items:typeof rows)=>({reviewed:items.length,supported:items.filter(r=>r.verdict==='supported').length,
-  unsupported:items.filter(r=>r.verdict==='unsupported').length,uncertain:items.filter(r=>r.verdict==='uncertain').length});
+ const counts=(items:typeof rows)=>{
+  const decided=items.filter(r=>r.verdict!=='uncertain');
+  const topOne=decided.filter(r=>r.rank===1);
+  return {reviewed:items.length,supported:items.filter(r=>r.verdict==='supported').length,
+   unsupported:items.filter(r=>r.verdict==='unsupported').length,uncertain:items.filter(r=>r.verdict==='uncertain').length,
+   judgedRelevantShare:decided.length?Number((decided.filter(r=>r.verdict==='supported').length/decided.length).toFixed(3)):null,
+   topOneJudgedRelevantShare:topOne.length?Number((topOne.filter(r=>r.verdict==='supported').length/topOne.length).toFixed(3)):null,
+   decided:decided.length,topOneJudged:topOne.length};
+ };
  return Response.json({rows,summary:{retrieval:counts(retrieval),claims:counts(claims),sampleLimit:100},
-  note:'Reviewer judgments are human supplied. Counts are not measured retrieval recall or population accuracy.'},
+  note:'Reviewer judgments are human supplied. Judged relevance shares cover only voluntarily reviewed passages, not complete document recall, model accuracy, or population precision.'},
   {headers:{'Cache-Control':'no-store'}});
 }
 export async function POST(request:Request){
