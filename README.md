@@ -78,3 +78,7 @@ Arena includes immutable quote-dated paper equity captures, per-agent descriptiv
 ### Strategy Evolution — versioned shadow competitions
 
 Phase 8 now includes two independent $5,000 forward-paper shadow books per investor experiment, allocation-cap challenger versions, source-dated paired observations, gated return/drawdown comparisons, explicit owner promotion/rollback, and experiment retirement. **No AI agent silently changes its strategy or trades real money.** Apply `supabase/migrations/202611070007_phase8_shadow_tournaments.sql` in Supabase and open **Agent arena → Strategy Evolution Arena**. See the [evolution runbook](docs/PHASE_8_EVOLUTION.md).
+
+### Phase 8 — Visual Agent Operations Studio
+
+The Arena now includes a premium, interactive Research Room showing the real **Research → Strategy → Critic → Risk → Decision** backend workflow, source-backed evidence cards, visible AI vs. fallback mode, adversarial debate messages, deterministic veto controls, and saved owner-only audit replay. **Research is read-only and never submits paper or real orders.** Apply `supabase/migrations/202611070008_phase8_agent_operations_studio.sql` in Supabase. See the [Operations Studio runbook](docs/PHASE_8_OPERATIONS_STUDIO.md).
