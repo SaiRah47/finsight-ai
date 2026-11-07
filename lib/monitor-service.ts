@@ -19,6 +19,7 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
  const {data:settings,error:se}=await db.from('monitor_settings').select('enabled,email_enabled,filings_enabled').eq('user_id',userId).maybeSingle();
  if(se)throw Error('Monitoring migration unavailable: '+se.message);
  if(!settings?.enabled)return {runId:null,status:'disabled',symbols:0,created:0,errors:[]};
+ const prefs=settings;
  const day=new Date().toISOString().slice(0,10);
  // Unique per-owner/day row is an atomic, database-level claim that prevents duplicate cron invocations.
  const {data:run,error:re}=await db.from('monitor_runs').insert({user_id:userId,run_day:day,status:'running'}).select('id').single();
@@ -32,7 +33,7 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
   const key=kind+':'+eventKey;
   const {error}=await db.from('monitor_events').insert({
    user_id:userId,run_id:runId,event_key:key,kind,symbol,title,details,observation_at,source_url,
-   email_status:settings.email_enabled?'pending':'not_requested'
+   email_status:prefs.email_enabled?'pending':'not_requested'
   });
   if(!error){created++;return}
   if(error.code!=='23505')errors.push('Event persistence: '+error.message.slice(0,100));
@@ -80,7 +81,7 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
     if(stateError)errors.push('Rule state persistence: '+stateError.message.slice(0,100));
    }
   }
-  if(settings.filings_enabled){
+  if(prefs.filings_enabled){
    const {data:watch,error:watchError}=await db.from('watchlist_symbols').select('symbol').eq('user_id',userId).order('created_at',{ascending:false}).limit(2);
    if(watchError)errors.push('SEC watchlist lookup: '+watchError.message.slice(0,100));
    else for(const row of watch||[]){
