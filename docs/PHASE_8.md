@@ -50,3 +50,20 @@ Season 1 strategy *proxies* select universe symbols by deterministic round-robin
 3. Portfolio rebalancing/selling, risk budgets, position caps, and corporate-action adjustment.
 4. Validated intraday feed, separate Trading League simulator and realistic fill semantics.
 5. Historical replay with point-in-time datasets and strict look-ahead exclusion.
+
+## Phase 8 learning lab — controlled improvement (new)
+
+**Learning is deliberately not an unrestricted profit-maximizing feedback loop.** It separates observation, diagnosis, a research-only modification hypothesis, and future validation.
+
+1. Apply `supabase/migrations/202611070006_phase8_agent_learning.sql` separately after the original Season 1 migration. It adds owner-readable, privileged-server-write-only `arena_equity_observations` and `arena_learning_reviews`. Existing positions, strategies, order history and cash are unchanged.
+2. In **Agent arena → Agent learning lab** choose **Record session equity**. The server retrieves USD market quotes for actual held assets. Only complete, consistently dated weekday observations within the conservative age window are stored. Cash-only agents and missing quotes are not given fake market snapshots. Each observation is immutable and unique per agent and exchange date.
+3. Choose **Review agent performance**. The server evaluates observed equity time series, reports preliminary return, maximum observed drawdown, negative day counts, and a limited standard deviation of session returns. At least 5 distinct observations are needed for early diagnostics; at least 20 before a *research-only* allocation-size hypothesis may appear when drawdown exceeds 8%.
+4. All seven strategy identities remain unchanged. No proposed change can modify cash, order creation, or allocation settings. No self-training, shadow execution, or autonomous model edits have been implemented.
+5. Repeated same-day review attempts return the existing stored review record. The UI shows the calculated report on the same data but does not pretend it creates additional observations.
+
+### Fairness and risk limits
+- Quote timestamps may be delayed. A market-date check does not establish every quote is contemporaneous or fully adjusted.
+- Observed portfolio equity is not total-return adjusted for dividends, splits, taxes, and all market frictions.
+- Drawdown can reflect market conditions rather than poor strategy design. Agents cannot reliably optimize profits from fewer than a significant number of forward observations.
+- Future real self-improvement needs versioned strategies, frozen train/test splits, out-of-sample shadow portfolios, baseline benchmarks, risk-adjusted acceptance criteria, rollback, and explicit promotion approval.
+- The `compareCandidateWithBaseline` utility offers a conservative paired-series prerequisite for future shadow tests but is not itself proof of model superiority.

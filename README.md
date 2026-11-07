@@ -70,3 +70,7 @@ Phase 7 adds a secret-protected Vercel daily cron route, owner-only monitoring p
 ## Phase 8 — Agent Arena (Season 1)
 
 Four investor strategy baselines and three paused intraday trader personas each have isolated virtual **$5,000** accounts. The current owner-triggered investor cycle uses deterministic universe selection, atomic cash/position ledger accounting, modeled quote slippage, append-only paper trade records and a quote-based leaderboard. **These are paper trades, not LLM-autonomous decisions, and no trader league fills are enabled.** Apply `supabase/migrations/202611070005_phase8_agent_arena.sql` in Supabase and use the new **Agent arena** navigation section. See [Phase 8 guide](docs/PHASE_8.md).
+
+### Agent learning lab — controlled, observational self-review
+
+Arena includes immutable quote-dated paper equity captures, per-agent descriptive performance reviews, and explicitly **research-only** proposed risk-sizing experiments. No agents silently rewrite strategies or seek unbounded profit optimization; actual parameter promotion requires prospective out-of-sample evaluation and approval. Apply `supabase/migrations/202611070006_phase8_agent_learning.sql` separately. Details in [Phase 8](docs/PHASE_8.md).

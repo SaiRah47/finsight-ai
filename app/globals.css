@@ -627,3 +627,24 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .arena-cycle-summary p{font-size:11px;color:#c5d0e3;line-height:1.7}
 @media(max-width:900px){.arena-agent-grid,.arena-history{grid-template-columns:1fr}.arena-banner{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.arena-trader-grid,.arena-banner{grid-template-columns:1fr}.arena-agent-stats{grid-template-columns:1fr 1fr}}
+
+/* Phase 8 controlled learning: read-only review insights, no automatic strategy changes */
+.arena-learning{display:grid;gap:13px;padding:19px;border:1px solid #b9a6ff3c;border-radius:18px;background:linear-gradient(135deg,#211e3a,#141c30)}
+.arena-learning-actions{display:flex;gap:9px;flex-wrap:wrap}
+.arena-learning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.arena-learning-card{border:1px solid #ffffff22;border-radius:14px;background:#101a2d;padding:16px;display:grid;gap:13px}
+.arena-learning-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.arena-learning-stats>div{display:grid;gap:7px;background:#20243c;padding:10px;border-radius:10px}
+.arena-learning-stats small,.arena-learning-proposal small{font-size:10px;color:#a0aecb}
+.arena-learning-stats strong{font-size:16px;color:#e4ddfb}
+.arena-learning-findings{display:grid;gap:7px}
+.arena-learning-findings p{font-size:11px;line-height:1.65;color:#aebbd5;margin:0}
+.arena-learning-proposal{border:1px solid #88dfd43e;background:#87e4e809;padding:13px;border-radius:11px;display:grid;gap:7px}
+.arena-learning-proposal p{color:#d6deed;font-size:11px;line-height:1.6;margin:0}
+.arena-learning-proposal strong{color:#9bece2;font-size:12px}
+.arena-learning-proposal span{font-size:10px;color:#91abc0}
+.arena-learning-coverage{padding:11px;border:1px solid #ffffff27;border-radius:10px}
+.arena-learning-coverage summary{cursor:pointer;color:#c6c2eb;font-size:11px}
+.arena-learning-coverage p{font-size:10px;color:#a9b6ce;line-height:1.6}
+@media(max-width:780px){.arena-learning-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.arena-learning{padding:13px}.arena-learning-stats strong{font-size:13px}}

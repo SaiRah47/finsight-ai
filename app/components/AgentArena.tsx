@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {ARENA_STRATEGIES} from '@/lib/arena-strategies';
+import ArenaLearningLab from './ArenaLearningLab';
 type Agent={id:string;slug:string;league:'investor'|'trader';status:string;cash:number};
 type Position={agent_id:string;symbol:string;shares:number;average_cost:number};
 type Order={id:string;agent_id:string;symbol:string;side:string;shares:number;fill_price:number;fee:number;reason:string;signal_date:string;created_at:string};
@@ -66,6 +67,7 @@ export default function AgentArena(){
   })}</div>
   <div className="sectiontitle"><h2>Trading League</h2><span className="pill">Paused / not evaluated</span></div>
   <div className="arena-trader-grid">{traders.map(agent=><div key={agent.id}><strong>{label(agent.slug)}</strong><span>{ARENA_STRATEGIES.find(s=>s.slug===agent.slug)?.thesis}</span><small>{currency(agent.cash)} virtual cash · {agent.status}</small></div>)}</div>
+  <ArenaLearningLab agents={snapshot.agents}/>
   <div className="arena-history"><div className="atlas-phase6-panel"><h3>Executed virtual orders · {latestOrder.length} recent</h3>
    {!latestOrder.length?<p className="muted">No virtual orders recorded yet.</p>:latestOrder.slice(0,20).map(order=><div className="arena-history-item" key={order.id}><strong>{label(snapshot.agents.find(a=>a.id===order.agent_id)?.slug||'')}</strong><span>{order.side.toUpperCase()} {order.shares} {order.symbol} @ {currency(Number(order.fill_price))}</span><small>{order.signal_date} · {new Date(order.created_at).toLocaleString()}</small></div>)}</div>
    <div className="atlas-phase6-panel"><h3>Decision audit · {snapshot.decisions.length} recent</h3>
