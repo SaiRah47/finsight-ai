@@ -1,0 +1,30 @@
+name: Verify production build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: TypeScript and Next.js production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript check
+        run: npm run typecheck
+      - name: Next.js production build
+        run: npm run build
+      - name: Verify compiled output
+        run: test -f .next/BUILD_ID
