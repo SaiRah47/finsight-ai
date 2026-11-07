@@ -35,8 +35,10 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
    user_id:userId,run_id:runId,event_key:key,kind,symbol,title,details,observation_at,source_url,
    email_status:prefs.email_enabled?'pending':'not_requested'
   });
-  if(!error){created++;return}
-  if(error.code!=='23505')errors.push('Event persistence: '+error.message.slice(0,100));
+  if(!error){created++;return true}
+  if(error.code==='23505')return true; // Already recorded by a previous attempt.
+  errors.push('Event persistence: '+error.message.slice(0,100));
+  return false;
  }
  try{
   const {data:rules,error:ruleError}=await db.from('watchlist_alert_rules').select('id,symbol,metric,threshold,enabled').eq('user_id',userId).eq('enabled',true).order('created_at',{ascending:false}).limit(30);
@@ -56,24 +58,27 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
     const quote=await getQuote(symbol);
     observation.price=quote.price;observation.changePercent=quote.changePercent;observation.asOf=quote.asOf;
    }catch(e){errors.push(symbol+' quote: '+safeError(e))}
+   let historyDate:string|null=null;
    if(historical)try{
     const report=await analyzeSymbol(symbol);
     observation.volatility20=report.metrics.find(m=>m.id==='volatility20')?.value??null;
     observation.volumeRatio=report.metrics.find(m=>m.id==='volumeRatio')?.value??null;
-    // Use the completed historical observation date for historical-only rules below.
+    historyDate=report.lastDate;
    }catch(e){errors.push(symbol+' history: '+safeError(e))}
    for(const rule of selected){
-    // Historical rules use completed daily series observation; price rules use provider quote timestamp.
-    const next=transitionRule(rule,observation,previous.get(rule.id)||false);
+    const isHistorical=rule.metric==='volatility_above'||rule.metric==='volume_ratio_above';
+    const dated={...observation,asOf:isHistorical?historyDate:observation.asOf};
+    const next=transitionRule(rule,dated,previous.get(rule.id)||false);
     if(next.observation===null||!Number.isFinite(rule.threshold)){
      errors.push(symbol+' '+rule.metric+': no dated observation, preserving state');
      continue;
     }
     if(next.emit){
      const metric=rule.metric.replaceAll('_',' ');
-     await emit('threshold',rule.id+':'+next.observation,symbol,
+     const stored=await emit('threshold',rule.id+':'+next.observation,symbol,
       symbol+' '+metric+' threshold exceeded',
       'Threshold '+rule.threshold+'; provider observation: '+next.observation+'. '+next.reason,next.observation,null);
+     if(!stored)continue; // Do not lose the event by advancing its trigger state.
     }
     const {error:stateError}=await db.from('monitor_rule_state').upsert({
      user_id:userId,rule_id:rule.id,triggered:next.triggered,last_observation:next.observation,updated_at:new Date().toISOString()
@@ -93,13 +98,15 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
      const {data:state,error:stateError}=await db.from('monitor_filing_state').select('last_accession').eq('user_id',userId).eq('symbol',symbol).maybeSingle();
      if(stateError){errors.push('SEC baseline read: '+stateError.message.slice(0,100));continue}
      const discovery=classifyFilings(recent.map(f=>f.accession),state?.last_accession??null);
+     let storedAll=true;
      for(const accession of discovery.newAccessions.slice(0,3)){
       const filing=recent.find(f=>f.accession===accession);
       if(!filing)continue;
-      await emit('filing',symbol+':'+accession,symbol,
+      const stored=await emit('filing',symbol+':'+accession,symbol,
        symbol+' filed SEC '+filing.form,'Official SEC '+filing.form+' filed '+filing.filed+'.',filing.filed,filing.url);
+      if(!stored)storedAll=false;
      }
-     if(discovery.nextLastSeen&&(discovery.nextLastSeen!==state?.last_accession)){
+     if(storedAll&&discovery.nextLastSeen&&(discovery.nextLastSeen!==state?.last_accession)){
       const {error:e}=await db.from('monitor_filing_state').upsert({user_id:userId,symbol,last_accession:discovery.nextLastSeen,updated_at:new Date().toISOString()},{onConflict:'user_id,symbol'});
       if(e)errors.push('SEC baseline persistence: '+e.message.slice(0,100));
      }
