@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:signals": "node --experimental-strip-types --test tests/*.test.ts"
+    "test:signals": "node --experimental-strip-types --test tests/*.test.ts",
+    "eval:retrieval": "node --experimental-strip-types scripts/evaluate-retrieval.ts"
   },
   "dependencies": {
     "next": "^15.5.0",
