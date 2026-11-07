@@ -3,6 +3,7 @@ import {getQuote,MarketError} from '@/lib/market';
 import {resolveResearchSymbol} from './symbol-resolution';
 import {analyzeSymbol} from '@/lib/radar';
 import {getCompanyFilings} from '@/lib/sec';
+import {getRelevantSecPassages} from '@/lib/sec-passages';
 import {synthesizeOptional,type ResearchSource,type ResearchNodeEvent} from './research-synthesis';
 
 type Route='market'|'risk'|'filings'|'combined';
@@ -41,7 +42,7 @@ async function riskResearch(symbol:string):Promise<Finding>{
   };
  }catch(error){return unsupported('Historical risk for '+symbol+' unavailable: '+(error instanceof Error?error.message:'provider error'))}
 }
-async function filingsResearch(symbol:string):Promise<Finding>{
+async function filingsResearch(symbol:string,question:string):Promise<Finding>{
  try{
   const company=await getCompanyFilings(symbol);
   const filings=company.filings.slice(0,6);
@@ -52,10 +53,26 @@ async function filingsResearch(symbol:string):Promise<Finding>{
   ];
   if(!filings.length)evidence.push('No matching 10-K, 10-Q, or 8-K in the current submissions summary.');
   if(!company.facts.length)evidence.push('No matching validated revenue or net-income XBRL figures were available.');
-  evidence.push('Full filing text and risk-factor sections have not been extracted; do not claim a filing states a particular narrative or a cause for market volatility.');
+  const passageSources:ResearchSource[]=[];
+  // Passage retrieval is bounded, opt-in by research question, and never replaces direct SEC links.
+  try{
+   const retrieved=await getRelevantSecPassages(symbol,question);
+   if(retrieved.passages.length){
+    evidence.push('The following text excerpts were retrieved from official SEC filing documents. Extracted formatting can be imperfect; verify in the original filing.');
+    for(const passage of retrieved.passages){
+     // Excerpt and provenance are kept together; no unsupported section summary is invented.
+     passageSources.push(source(passage.url,`${passage.form} · ${passage.section} · excerpt at character ${passage.start} · filed ${passage.filed}`,passage.filed,'sec-filing'));
+     const clipped=passage.text.slice(0,650);
+     evidence.push(`SEC PASSAGE [${passage.form}, filed ${passage.filed}, section "${passage.section}", accession ${passage.accession}, character range ${passage.start}-${passage.end}]: "${clipped}"`);
+    }
+   }else evidence.push('No relevant full-text SEC passage was retrieved; do not infer the contents of risk-factor sections.');
+   for(const warning of retrieved.warnings.slice(0,3))evidence.push('Retrieval limitation: '+warning);
+  }catch(error){
+   evidence.push('Full-text SEC extraction unavailable: '+(error instanceof Error?error.message:'retrieval failure')+'. Filing metadata remains independently sourced.');
+  }
   return {
    source:filings.length?'sec-edgar':'unavailable',asOf:filings[0]?.filed??null,
-   sources:filings.map(f=>source(f.url,`${company.name} ${f.form} filed ${f.filed}`,f.filed,'sec-filing')),
+   sources:[...passageSources,...filings.map(f=>source(f.url,`${company.name} ${f.form} filed ${f.filed}`,f.filed,'sec-filing'))],
    evidence
   };
  }catch(error){return unsupported('SEC filings for '+symbol+' unavailable: '+(error instanceof Error?error.message:'SEC provider error'))}
@@ -104,7 +121,7 @@ export function createResearchGraph(progress?:(ev:ResearchNodeEvent)=>void){
  }))
  .addNode('filings',async state=>timed('filings',async()=>{
   const symbol=state.symbol;
-  return adapt(symbol?await filingsResearch(symbol):unsupported('Specify an SEC-reporting company name or ticker such as NVIDIA or NVDA.'));
+  return adapt(symbol?await filingsResearch(symbol,state.question):unsupported('Specify an SEC-reporting company name or ticker such as NVIDIA or NVDA.'));
  }))
  .addNode('combined',async state=>timed('combined',async()=>{
   const symbol=state.symbol;
@@ -112,7 +129,7 @@ export function createResearchGraph(progress?:(ev:ResearchNodeEvent)=>void){
   // Separate evidence collectors run concurrently; neither can fabricate absent observations.
   const [risk,filings]=await Promise.all([
    timed('risk',()=>riskResearch(symbol)),
-   timed('filings',()=>filingsResearch(symbol))
+   timed('filings',()=>filingsResearch(symbol,state.question))
   ]);
   const valid=[risk,filings].filter(f=>f.source!=='unavailable').length;
   return adapt({evidence:[...risk.evidence,...filings.evidence],

@@ -380,3 +380,17 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .historical-sources a span{font-weight:800}
 .raw-trace{margin-top:10px;border:1px solid #ffffff1b;border-radius:12px;padding:12px}
 .raw-trace>summary{font-size:11px;display:list-item;color:#9ba3c1}
+
+/* SEC bounded full-text passage retrieval */
+.sec-passage-search{display:grid;gap:10px;padding:17px;border:1px solid #ffffff23;background:#14192c;border-radius:17px}
+.sec-passage-search label{font-size:11px;color:#b9bdd9}
+.sec-passage-search>div{display:flex;gap:9px;flex-wrap:wrap}
+.sec-passage-search input{flex:1 1 260px;min-width:0;border:1px solid #ffffff30;background:#0e1121;border-radius:11px;padding:12px;color:#f4f0ff}
+.sec-passage-search p{font-size:10px;color:#939dbb;line-height:1.65}
+.sec-passages{display:grid;gap:11px}.sec-passages h4{font-size:13px;margin:5px 0}
+.sec-passages article{border:1px solid #ffffff24;border-radius:14px;padding:17px;background:#171b32}
+.sec-passage-head{display:flex;justify-content:space-between;gap:10px;color:#bbaafb;font-size:10px;font-weight:700;flex-wrap:wrap}
+.sec-passages article p{font-size:12px;color:#c9cce1;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}
+.sec-passages article a{font-size:11px;color:#87e4e8;text-decoration:underline}
+.sec-passages details{font-size:11px;color:#aeb6d3}
+@media(max-width:700px){.sec-passage-search button{width:100%}}

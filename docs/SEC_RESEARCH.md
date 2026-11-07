@@ -55,3 +55,12 @@ Never use a `NEXT_PUBLIC_` prefix for these keys. Don't paste them into chat or 
 - Research history and SSE timeline save accessible records under Supabase owner.
 - No-key mode: evidence-only summary, no external LLM call.
 - Optional-key mode: source-linked AI narrative, with fallback if provider unavailable.
+
+## Bounded SEC text retrieval (Milestone 4 expansion)
+- `GET /api/sec/passages?symbol=NVDA&q=cybersecurity%20risks` is owner-only, validates inputs, and retrieves up to two most recent 10-K/10-Q primary filing documents from official EDGAR archival URLs obtained from the SEC submissions API.
+- Uses no semantic embeddings, vector DB, paid extraction service, or LLM to rank. It strips HTML/script/head content, truncates to a bounded text window, constructs overlapping ~1,100-character passages, then ranks by deterministic keyword relevance with extra weight for matching section headings.
+- For resource and SEC fair-access safety: 2.4 MB per filing download, 14-second request timeout, 280k characters analyzed, 240 passage windows, at most five returned excerpts, and long-lived Next.js upstream caching. Overlarge filings are reported as unavailable, never silently represented as complete.
+- Original official links, form, filing date, accession and approximate character offsets accompany excerpts. Heading detection is heuristic: source HTML may contain repeats, tables, or imperfect order. Compare any material quote against the original.
+- The LangGraph filings/combined routes attempt passage retrieval; when blocked/oversized/no match, return metadata plus a limitation message instead of inventing filing narrative.
+- Optional AI synthesis consumes bounded excerpts as **untrusted input**, with verified citations required to accept an AI answer. This is basic citation validation, not a claim of complete factual verification.
+- Future work: HTML-native table extraction, robust heading hierarchy, typed exhibit attachments, embeddings and retrieval quality evaluation on a labeled dataset.
