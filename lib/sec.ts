@@ -25,8 +25,9 @@ async function secJson(url:string,ttl:number):Promise<unknown>{
  const parsed=new URL(url);
  if(!([new URL(SEC_HOST).hostname,new URL(SEC_WWW).hostname].includes(parsed.hostname))||parsed.protocol!=='https:')
   throw new SecError('Invalid SEC API endpoint',400);
+ const agent=userAgent();
  let response:Response;
- try{response=await fetch(url,{headers:{'User-Agent':userAgent(),'Accept':'application/json'},next:{revalidate:ttl},signal:AbortSignal.timeout(12000)})}
+ try{response=await fetch(url,{headers:{'User-Agent':agent,'Accept':'application/json'},next:{revalidate:ttl},signal:AbortSignal.timeout(12000)})}
  catch{throw new SecError('Could not reach SEC EDGAR. Try again later.',502)}
  if(response.status===429)throw new SecError('SEC EDGAR is rate-limiting this application. Try again later.',429);
  if(response.status===403)throw new SecError('SEC EDGAR denied access. Verify SEC_USER_AGENT and fair-access rules.',502);
