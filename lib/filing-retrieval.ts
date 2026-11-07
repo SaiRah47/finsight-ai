@@ -57,7 +57,7 @@ function headingAt(start:number,doc:FilingDocument):string{
  for(const section of doc.sections){if(section.start>start)break;heading=section.heading}
  return heading;
 }
-function makeChunks(doc:FilingDocument):FilingPassage[]{
+export function makeChunks(doc:FilingDocument):FilingPassage[]{
  // Use small overlapping windows instead of full-document context or remote vector storage.
  const result:FilingPassage[]=[];const span=1100,overlap=180;
  let start=0;
