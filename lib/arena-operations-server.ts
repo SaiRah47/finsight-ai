@@ -71,6 +71,13 @@ export async function runArenaStudio(owner:string,agentId:string,onEvent:(e:Even
  const {data:agent,error}=await db.from('arena_agents').select('slug,league,status').eq('id',agentId).eq('user_id',owner).single();
  if(error||!agent||agent.league!=='investor'||agent.status!=='active')throw Error('Select an active Investor League agent you own.');
  const strategy=strategyFor(agent.slug);if(!strategy?.enabled)throw Error('Selected strategy unavailable.');
+ // Bound repeat paid-provider/model calls; archived runs remain free to inspect.
+ const recent=await db.from('arena_orchestration_runs').select('created_at').eq('user_id',owner)
+  .eq('agent_id',agentId).order('created_at',{ascending:false}).limit(1).maybeSingle();
+ if(recent.error)throw Error('Studio audit unavailable; apply the Studio migration.');
+ if(recent.data&&Date.now()-new Date(recent.data.created_at).getTime()<60_000)
+  throw Error('This team ran a research session in the last minute. Inspect the saved session or retry after the cooldown.');
+
  const {count,error:ordersError}=await db.from('arena_orders').select('id',{count:'exact',head:true}).eq('agent_id',agentId).eq('user_id',owner);
  if(ordersError)throw Error('Could not establish a research ticker from saved orders.');
  const symbol=strategy.symbols[(count||0)%strategy.symbols.length];
