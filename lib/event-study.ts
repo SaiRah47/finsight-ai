@@ -1,5 +1,5 @@
 import type {PriceBar} from './market';
-import {calculateSignals} from './signals';
+import {calculateSignals} from './signals.ts';
 
 export type EventStudy={
  threshold:number;
