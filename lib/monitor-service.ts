@@ -14,6 +14,7 @@ function adminDb(){
 }
 const safeError=(e:unknown)=>e instanceof Error?e.message.slice(0,180):'Unknown provider failure';
 export async function scanOwnerMonitoring():Promise<ScanSummary>{
+ const startedAt=Date.now();
  const db=adminDb(),userId=process.env.FINSIGHT_OWNER_USER_ID;
  if(!userId)throw Error('FINSIGHT_OWNER_USER_ID is required.');
  const {data:settings,error:se}=await db.from('monitor_settings').select('enabled,email_enabled,filings_enabled').eq('user_id',userId).maybeSingle();
@@ -51,6 +52,7 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
   if(priorError)throw Error('Rule-state query unavailable: '+priorError.message);
   const previous=new Map((prior||[]).map(x=>[String(x.rule_id),Boolean(x.triggered)]));
   for(const symbol of symbols){
+   if(Date.now()-startedAt>30_000){errors.push('Daily market scan stopped at 30-second soft budget; remaining symbols deferred.');break}
    const selected=active.filter(r=>r.symbol===symbol);
    const historical=selected.some(r=>r.metric==='volatility_above'||r.metric==='volume_ratio_above');
    const observation:AlertObservation={symbol,price:null,changePercent:null,volatility20:null,volumeRatio:null,asOf:null};
@@ -86,10 +88,11 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
     if(stateError)errors.push('Rule state persistence: '+stateError.message.slice(0,100));
    }
   }
-  if(prefs.filings_enabled){
+  if(prefs.filings_enabled&&Date.now()-startedAt<=37_000){
    const {data:watch,error:watchError}=await db.from('watchlist_symbols').select('symbol').eq('user_id',userId).order('created_at',{ascending:false}).limit(2);
    if(watchError)errors.push('SEC watchlist lookup: '+watchError.message.slice(0,100));
    else for(const row of watch||[]){
+    if(Date.now()-startedAt>44_000){errors.push('SEC monitoring stopped at 44-second soft budget.');break}
     const symbol=String(row.symbol);
     try{
      const company=await getCompanyFilings(symbol,{includeFacts:false});
@@ -112,7 +115,7 @@ export async function scanOwnerMonitoring():Promise<ScanSummary>{
      }
     }catch(e){errors.push(symbol+' SEC: '+safeError(e))}
    }
-  }
+  }else if(prefs.filings_enabled){errors.push('SEC monitoring deferred because the market scan reached the daily execution budget.')}
  }catch(e){errors.push(safeError(e))}
  const status=errors.length?'partial':'completed';
  await db.from('monitor_runs').update({status,completed_at:new Date().toISOString(),symbols_scanned:symbolCount,events_created:created,error_text:errors.slice(0,6).join('; ').slice(0,1000)||null}).eq('id',runId).eq('user_id',userId);
