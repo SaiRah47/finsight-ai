@@ -48,7 +48,7 @@ export function reviewEquitySeries(observations:EquityObservation[],currentAlloc
  if(maxDrawdown>=8){
   base.verdict='needs-investigation';
   base.candidateChange={parameter:'targetAllocation',current:currentAllocation,
-   candidate:round(Math.max(0.05,current-0.05)),
+   candidate:round(Math.max(0.05,currentAllocation-0.05)),
    reason:'Consider testing a smaller maximum single-order allocation in a separate shadow experiment; drawdown does not establish causation.',
    stage:'research-only'};
   base.findings.push('High observed drawdown warrants inspection of concentration, data coverage and timing.');
