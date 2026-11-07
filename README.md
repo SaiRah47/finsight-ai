@@ -1,20 +1,40 @@
 # FinSight ATLAS
 
-Personal, non-commercial financial research platform.
+An experimental, non-commercial financial intelligence workspace for a single user.
 
-## Foundation
+## Current foundation
 
-- Custom Next.js + TypeScript dashboard with Spectrum design system
-- LangGraph research workflow and streamed Execution Studio
-- Synthetic market data until licensed data sources are connected
-- Deployment target: Vercel Hobby
+- Custom **Next.js + TypeScript** Spectrum dashboard with responsive layout
+- **LangGraph** routing graph for market, risk, and SEC filing research intents
+- Server-Sent Events demonstration at `POST /api/agent/trace`
+- **Execution Studio** tab that displays emitted workflow events
+- **GitHub Actions** production build checks
+- Mock financial values are explicitly labeled synthetic; live data is not connected
 
-> **Build status:** Source import pending. This repository has been initialized; the full application source is maintained in the current project bundle and is not yet on GitHub.
+## Run
 
-## Privacy
+```bash
+npm install
+npm run dev
+```
 
-Never commit account holdings, credentials, personal financial information, private project plans, or interview notes. Use environment variables and synthetic data for demos.
+Visit http://localhost:3000. The health endpoint is `GET /api/health`.
 
-## Validation
+## Quality checks
 
-After importing the complete project source, GitHub Actions should run TypeScript validation and a Next.js production build.
+```bash
+npm run typecheck
+npm run build
+```
+
+## Next
+
+Supabase access control, real market data providers, richer workflow traces, and Vercel deployment.
+
+## Data and privacy
+
+Do not commit credentials, brokerage data, personal holdings, private planning documents, or interview notes. All financial prices and valuations currently shown are **fictional samples**, not live recommendations.
+
+## Development status
+
+This is the **GitHub-hosted foundation** of FinSight, not yet the complete earlier v3 design archive. The full Spectrum/Execution Studio prototype remains available as a separate local project bundle for subsequent migration.
