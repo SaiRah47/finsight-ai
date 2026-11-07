@@ -92,3 +92,43 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .history-row p{line-height:1.7;font-size:12px;color:#c2c7db}
 .history-row pre{overflow:auto;background:#0e1020;padding:12px;border-radius:12px;font-size:10px;color:#c3c0dc;max-height:270px}
 @media(max-width:700px){.demo-mode-notice{position:static;background:#17182b;text-align:center;padding:6px 4px;font-size:8px}.signout-float{top:16px;right:68px;padding:7px;font-size:10px}.vault-card{padding:17px}.history-row summary{display:grid}.access-card{padding:26px}}
+
+/* Account navigation and polished authentication transitions */
+.account-control{position:relative;z-index:20;flex:none}
+.account-trigger{display:flex;align-items:center;gap:7px;border:1px solid #ffffff20;background:#1b1c31b0;color:#d7d4f0;border-radius:999px;padding:4px 9px 4px 4px;transition:border-color .2s,background .2s,box-shadow .2s}
+.account-trigger:hover,.account-trigger.is-open{border-color:#b8a6ff80;background:#292442;box-shadow:0 0 0 3px #b8a6ff12}
+.account-trigger .avatar{width:34px;height:34px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.account-chevron{font-size:16px;color:#b9b5d8;line-height:1}
+.account-popover{position:absolute;top:calc(100% + 11px);right:0;width:min(290px,calc(100vw - 32px));padding:10px;border:1px solid #b8a6ff35;background:#19192df5;box-shadow:0 20px 60px #050614a3;border-radius:19px;backdrop-filter:blur(24px);animation:account-drop .24s cubic-bezier(.22,1,.36,1) both;z-index:100}
+.account-identity{padding:10px 9px;display:flex;align-items:center;gap:11px;min-width:0}
+.account-identity-icon{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:13px;color:#191629;background:linear-gradient(135deg,#b8a6ff,#87e4e8);font-size:12px;font-weight:800}
+.account-identity>div{min-width:0;display:grid;gap:3px}
+.account-identity-label{font-size:10px;color:#a0a2c0}
+.account-identity strong{font-size:11px;color:#f0edff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:650}
+.account-divider{height:1px;background:#ffffff19;margin:5px 3px 8px}
+.account-signout{width:100%;display:flex;align-items:center;gap:11px;border:0;background:transparent;border-radius:11px;color:#e9dcf6;padding:12px;text-align:left;font-size:12px;font-weight:700;transition:background .2s}
+.account-signout:hover{background:#f5a0b61b}
+.account-signout span{font-size:17px;color:#f5a0b6;transform:rotate(45deg)}
+.workspace-transition{min-height:100vh}
+.workspace-entering{animation:workspace-reveal .65s cubic-bezier(.2,1,.35,1) both}
+.workspace-leaving{animation:workspace-depart .35s ease-in both;pointer-events:none}
+.auth-transition-overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(ellipse at 50% 42%,#383050 0%,#151427 45%,#0b0d1b 90%);z-index:400;animation:auth-overlay-appear .3s ease-out both}
+.auth-transition-mark{display:grid;place-items:center;width:75px;height:75px;border-radius:24px;background:linear-gradient(135deg,#b8a6ff,#87e4e8);font-size:39px;color:#111527;box-shadow:0 0 80px #a898ff45;animation:auth-mark-glow 1.4s ease-in-out infinite alternate}
+.auth-transition-overlay p{font-size:13px;color:#d6d1ef;letter-spacing:.03em}
+.access-card{animation:access-card-enter .55s cubic-bezier(.22,1,.36,1) both}
+.auth-checking{display:flex;align-items:center;gap:11px;color:#a8a6c6;font-size:12px;margin-top:13px}
+.auth-checking-pulse{width:12px;height:12px;background:#87e4e8;border-radius:50%;box-shadow:0 0 0 6px #87e4e81f;animation:auth-mark-glow 1s ease-in-out infinite alternate}
+@keyframes account-drop{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes workspace-reveal{from{opacity:0;transform:translateY(14px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes workspace-depart{from{opacity:1;transform:scale(1);filter:blur(0)}to{opacity:0;transform:scale(.985);filter:blur(6px)}}
+@keyframes auth-overlay-appear{from{opacity:0}to{opacity:1}}
+@keyframes access-card-enter{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes auth-mark-glow{from{transform:scale(.97);box-shadow:0 0 35px #a898ff25}to{transform:scale(1.04);box-shadow:0 0 85px #a898ff65}}
+@media(max-width:700px){
+ .account-trigger{padding:3px 8px 3px 3px;gap:5px}
+ .account-trigger .avatar{width:32px;height:32px}
+ .account-popover{right:0}
+}
+@media(prefers-reduced-motion:reduce){
+ .workspace-entering,.workspace-leaving,.auth-transition-overlay,.auth-transition-mark,.access-card,.auth-checking-pulse,.account-popover{animation:none!important;filter:none!important;transform:none!important}
+}
