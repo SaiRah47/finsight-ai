@@ -48,3 +48,6 @@ Higher scores can be produced by sharp **downward** moves and volatility. No ran
 - Show event count, average subsequent five-session percent change, fraction of positive event outcomes, and average unconditional five-session return across eligible observations.
 - These outcome windows can overlap, so observations are not independent. An observation at the closing price is not an assumed executable trade. No corporate-action adjustment, costs, slippage, confidence intervals, benchmark adjustment, out-of-sample evaluation, or predictive significance claims.
 - If there are no events, report no performance statistic. It must not show 0% performance for absent observations.
+
+## Research question entity recognition
+The deterministic LangGraph demo recognizes selected company names (including NVIDIA → NVDA) as well as exact tickers and explicit $SYMBOL references. This is not yet a general company entity resolver. Unrecognized names report that limitation; provider failures are distinguished from failed company recognition. Regression tests cover NVIDIA phrasing and token-boundary behavior.
