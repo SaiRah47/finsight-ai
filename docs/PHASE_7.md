@@ -10,7 +10,7 @@
 - Stateful edge detection suppresses repeated threshold events while a condition stays true. An actual negative observation rearms the rule; missing data does not. Historical signal evaluation uses the completed bar date.
 - First successful SEC lookup **seeds a baseline** instead of alerting on all pre-existing filings. Later scans report newly appearing SEC accession numbers. If the prior accession falls out of the bounded window, the baseline is reseeded rather than guessing.
 - Private alert-event inbox with read/unread actions, latest run outcomes, source links, and optional email delivery.
-- Optional **Resend** delivery using configured, verified sender and a fixed recipient, only after owner turns on email. Uses event-ID idempotency keys. Provider failures are recorded; this is not a certified exactly-once delivery system.
+- Optional **Resend** delivery using configured, verified sender and a fixed recipient, only after owner turns on email. Combines up to four pending events into one email digest, with an idempotency key derived from its event IDs. Provider failures are recorded; this is not a certified exactly-once delivery system.
 - Owner-only **Run today's scan now** for acceptance testing; it consumes the same one-run-per-UTC-day allowance as Vercel cron and can use market API credits.
 - Existing Phase 6 on-demand checks remain available independently.
 
@@ -49,7 +49,7 @@
 - Vercel daily cron will not deliver sub-hour or intraday monitoring, and does not guarantee exact execution time.
 - On-demand and scheduled paths both consume Twelve Data/SEC provider resources. Scan limits are intentionally conservative; not all watchlist symbols or rules are scanned each day.
 - The daily run lock is **at-most-once attempt** per UTC day, not a distributed job-queue with retries. A partial or failed run is visible but will not automatically be retried the same day.
-- Event records are deduplicated by rule+observation timestamp and issuer+accession; this is not exactly-once email delivery.
+- Event records are deduplicated by rule+observation timestamp and issuer+accession; digest emails group up to four pending events per daily scan. This is not exactly-once email delivery.
 - Email status `failed` is recorded and is not automatically resent. The system avoids spammy retries.
 - Free-tier mail usage/verification requires an independent provider account; setting the email toggle with no provider configuration is prohibited.
 - No personal trading, brokerage execution, portfolio rebalancing, financial recommendations or price forecasts.
