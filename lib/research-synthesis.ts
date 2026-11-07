@@ -1,4 +1,5 @@
 import 'server-only';
+import {assessEvidence} from './evidence-validation';
 
 export type ResearchSource={id:string;label:string;url:string;date:string|null;type:'sec-filing'|'market-provider'};
 export type ResearchNodeEvent={step:string;status:'running'|'complete'|'unavailable'|'error';durationMs?:number;sourceCount?:number;at:string};
@@ -21,10 +22,9 @@ export async function synthesizeOptional(question:string,evidence:string[],sourc
   const json=await result.json() as {output?:Array<{content?:Array<{text?:unknown}>}>};
   const raw=(json.output||[]).flatMap(i=>i.content||[]).map(x=>typeof x.text==='string'?x.text:'').join('\n').trim();
   if(raw.length<30||raw.length>4500)return {text:null,mode:'deterministic',reason:'Optional model produced no usable summary.'};
-  // Reject citations referring to IDs that are not in the source list.
-  const allowed=new Set(sources.map(s=>s.id));
-  const cited=[...raw.matchAll(/\[([A-Z]\d+)\]/g)].map(m=>m[1]);
-  if(cited.some(id=>!allowed.has(id))||!cited.length)return {text:null,mode:'deterministic',reason:'Model citations missing or unverified. Using deterministic answer.'};
+  // Source-ID and coverage gate. This is not a semantic factual-entailment guarantee.
+  const assessment=assessEvidence(raw,sources);
+  if(!assessment.passesStructuralGate)return {text:null,mode:'deterministic',reason:'Model citations missing or unverified. Using deterministic answer.'};
   return {text:raw,mode:'llm',reason:'Optional model drafted a narrative from retrieved evidence; independently verify all claims.'};
  }catch{return {text:null,mode:'deterministic',reason:'Optional model request failed; using verifiable evidence.'}}
 }
