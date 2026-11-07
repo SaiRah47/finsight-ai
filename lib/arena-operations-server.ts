@@ -60,7 +60,7 @@ async function modelRole(stage:'research'|'strategy'|'critic',symbol:string,thes
   if(headline.length<5||explanation.length<25||!citations.length)return null;
   // Screen bare numeric claims against actual cited observation values.
   const claimed=explanation.match(/\d+(?:\.\d+)?/g)||[];
-  const observed=evidence.filter(x=>citations.includes(x.id)).map(x=>x.value).join(' ').match(/\d+(?:\.\d+)?/g)||[];
+  const observed:string[]=evidence.filter(x=>citations.includes(x.id)).map(x=>x.value).join(' ').match(/\d+(?:\.\d+)?/g)??[];
   if(claimed.some(x=>!observed.includes(x)))return null;
   return {stage,role:name,status:'complete',headline,explanation,vote,confidence,citedIds:citations,mode:'ai',
    checks:['Citation references validated','Unmatched numeric claims rejected']};
