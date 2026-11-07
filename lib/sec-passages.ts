@@ -1,5 +1,6 @@
 import 'server-only';
 import {getCompanyFilings} from './sec';
+import type {SecCompany} from './sec-types';
 import {downloadSecDocument} from './sec-download';
 import {extractFilingText,retrievePassages,type FilingPassage} from './filing-retrieval';
 
@@ -15,15 +16,17 @@ export type SecPassageResponse={
  retrievalMethod:'bounded-text-keyword-v2';fetchedAt:string;
  coverage:FilingCoverage[];durationMs:number;
 };
-export async function getRelevantSecPassages(symbol:string,question:string):Promise<SecPassageResponse>{
+export async function getRelevantSecPassages(symbol:string,question:string,company?:SecCompany):Promise<SecPassageResponse>{
  const started=Date.now();
- const data=await getCompanyFilings(symbol);
+ const data=company??await getCompanyFilings(symbol,{includeFacts:false});
  const target=data.filings.filter(f=>f.form==='10-K'||f.form==='10-Q').slice(0,2);
  const warnings=[...data.warnings];
  if(!target.length)warnings.push('No recent annual or quarterly report available for document retrieval.');
  const passages:SecRetrievedPassage[]=[];
  const coverage:FilingCoverage[]=[];
  for(const filing of target){
+  // Retain time for a response; never start a second document if the first consumed the budget.
+  if(Date.now()-started>35_000){warnings.push('Skipped remaining reports to stay within the request time budget.');break}
   try{
    const downloaded=await downloadSecDocument(filing.url);
    const document=extractFilingText(downloaded.html);

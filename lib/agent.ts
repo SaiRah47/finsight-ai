@@ -56,7 +56,7 @@ async function filingsResearch(symbol:string,question:string):Promise<Finding>{
   const passageSources:ResearchSource[]=[];
   // Passage retrieval is bounded, opt-in by research question, and never replaces direct SEC links.
   try{
-   const retrieved=await getRelevantSecPassages(symbol,question);
+   const retrieved=await getRelevantSecPassages(symbol,question,company);
    if(retrieved.passages.length){
     evidence.push('The following text excerpts were retrieved from official SEC filing documents. Extracted formatting can be imperfect; verify in the original filing.');
     for(const passage of retrieved.passages){

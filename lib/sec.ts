@@ -34,7 +34,7 @@ async function secJson(url:string,ttl:number):Promise<unknown>{
  if(!response.ok)throw new SecError('SEC EDGAR returned HTTP '+response.status,response.status===404?404:502);
  try{return await response.json()}catch{throw new SecError('SEC EDGAR returned an invalid JSON response.')}
 }
-export async function getCompanyFilings(symbol:string):Promise<SecCompany>{
+export async function getCompanyFilings(symbol:string,options:{includeFacts?:boolean}={}):Promise<SecCompany>{
  const normalized=symbol.trim().toUpperCase();
  if(!validSymbol(normalized))throw new SecError('Invalid stock symbol.',400);
  // Each company's SEC CIK comes from the periodically updated official ticker map.
@@ -49,7 +49,7 @@ export async function getCompanyFilings(symbol:string):Promise<SecCompany>{
  // Pull two carefully scoped XBRL concept endpoints rather than downloading enormous companyfacts payloads.
  // Filing metadata remains available even when facts are unavailable.
  const facts:SecFact[]=[];
- if(filings.some(f=>f.form==='10-K'||f.form==='10-Q')){
+ if(options.includeFacts!==false&&filings.some(f=>f.form==='10-K'||f.form==='10-Q')){
   for(const [tag,path] of [
    ['RevenueFromContractWithCustomerExcludingAssessedTax','RevenueFromContractWithCustomerExcludingAssessedTax'],
    ['NetIncomeLoss','NetIncomeLoss']

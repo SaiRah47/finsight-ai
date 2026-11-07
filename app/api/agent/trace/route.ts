@@ -5,6 +5,7 @@ import {authorizedOwner} from '@/lib/supabase/server';
 import {supabaseConfigured} from '@/lib/supabase/config';
 
 export const runtime='nodejs';
+export const maxDuration=60;
 const schema=z.object({question:z.string().trim().min(3).max(500)});
 export async function POST(request:Request){
  const owner=supabaseConfigured()?await authorizedOwner():null;

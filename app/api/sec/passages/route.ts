@@ -4,6 +4,7 @@ import {getRelevantSecPassages} from '@/lib/sec-passages';
 import {SecError} from '@/lib/sec';
 import {validSymbol} from '@/lib/market';
 export const runtime='nodejs';
+export const maxDuration=60;
 export async function GET(request:NextRequest){
  if(!await authorizedOwner())return Response.json({error:'Owner authentication required'},{status:401,headers:{'Cache-Control':'no-store'}});
  const symbol=(request.nextUrl.searchParams.get('symbol')||'').trim().toUpperCase();
