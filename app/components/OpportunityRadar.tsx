@@ -3,7 +3,8 @@ import {useState} from 'react';
 import {browserDb} from '@/lib/supabase/browser';
 
 type Metric={id:string;label:string;value:number|null;unit:'percent'|'multiple';status:string;explanation:string;observations:number};
-type Report={symbol:string;sampleCount:number;lastDate:string|null;latestClose:number|null;metrics:Metric[];
+type Study={eventCount:number;eligibleSessions:number;threshold:number;horizonSessions:number;meanEventReturnPercent:number|null;positiveEventRatePercent:number|null;unconditionalMeanReturnPercent:number|null;caveat:string};
+type Report={symbol:string;sampleCount:number;lastDate:string|null;latestClose:number|null;metrics:Metric[];eventStudy?:Study;
  attentionScore:number|null;attentionLabel:string;scoreBreakdown:{name:string;points:number;max:number;reason:string}[];
  warnings:string[];closes:{date:string;close:number}[];dataSource:string;methodology:string};
 type Result={symbol:string;report:Report|null;error:string|null};
@@ -71,6 +72,15 @@ export default function OpportunityRadar({onExplore}:{onExplore:(symbol:string)=
       <div className="radar-score-line"><div><strong>{report.attentionScore===null?'—':report.attentionScore}<span>{report.attentionScore===null?'':' / 100'}</span></strong><small>Activity score · {report.attentionLabel}</small></div><span className="radar-history-date">Last complete bar<br/>{report.lastDate||'Unknown'}</span></div>
       <div className="radar-score-rail"><div style={{width:(report.attentionScore??0)+'%'}}/></div>
       <Sparkline values={report.closes}/>
+      {report.eventStudy&&<div className="radar-study"><div className="radar-study-header"><strong>Historical event study</strong><span>5 completed sessions ahead</span></div>
+       {report.eventStudy.eventCount>0?<div className="radar-study-grid">
+        <div><span>Higher-activity events</span><strong>{report.eventStudy.eventCount}</strong></div>
+        <div><span>Mean forward change</span><strong>{report.eventStudy.meanEventReturnPercent?.toFixed(2)}%</strong></div>
+        <div><span>Positive observations</span><strong>{report.eventStudy.positiveEventRatePercent?.toFixed(1)}%</strong></div>
+        <div><span>Unconditional baseline</span><strong>{report.eventStudy.unconditionalMeanReturnPercent?.toFixed(2)??'—'}%</strong></div>
+       </div>:<p className="radar-no-events">No historical high-activity observations meet the threshold in the available sample; no outcome rate is reported.</p>}
+       <p>{report.eventStudy.eligibleSessions} eligible sessions · Overlapping outcomes · Exploratory, not a trading backtest or forecast</p>
+      </div>}
       <div className="radar-metric-grid">{report.metrics.map(metric=><Stat key={metric.id} metric={metric}/>)}</div>
       <button className="radar-details-toggle" aria-expanded={expanded.includes(symbol)} onClick={()=>toggle(symbol)}>{expanded.includes(symbol)?'Hide':'Show'} score methodology <span aria-hidden="true">{expanded.includes(symbol)?'−':'+'}</span></button>
       {expanded.includes(symbol)&&<div className="radar-method-details"><p>Score = absolute 20-day momentum (30 points) + relative volume (25) + realized volatility (25) + historical drawdown (20). Each contribution is capped. This measures activity, not prospective performance.</p>

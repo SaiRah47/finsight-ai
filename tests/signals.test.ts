@@ -51,3 +51,19 @@ test('score remains within 0–100 under extreme movements',()=>{
  const r=calculateSignals('TEST',fixture(100,i=>i%2===0?100:350,i=>i===99?50000:100));
  assert.ok(r.attentionScore!==null&&r.attentionScore>=0&&r.attentionScore<=100);
 });
+
+import {evaluateAttentionEvents} from '../lib/event-study.ts';
+test('event study on flat prices has no events and zero unconditional return',()=>{
+ const study=evaluateAttentionEvents('TEST',fixture(120,()=>100));
+ assert.equal(study.eventCount,0);
+ assert.equal(study.meanEventReturnPercent,null);
+ assert.equal(study.unconditionalMeanReturnPercent,0);
+ assert.ok(study.eligibleSessions>0);
+});
+test('event-study scores never use future observations for a given event',()=>{
+ const bars=fixture(95,i=>100+(i%2===0?0:35));
+ const s=evaluateAttentionEvents('TEST',bars,5,0);
+ // Every eligible historical observation triggers at threshold zero, and the final 5 have no known outcome.
+ assert.equal(s.eventCount,s.eligibleSessions);
+ assert.equal(s.lastEventDate,bars[bars.length-6].date);
+});

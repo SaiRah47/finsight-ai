@@ -11,6 +11,7 @@ export type SignalReport={
  latestClose:number|null;latestVolume:number|null;
  metrics:SignalMetric[];attentionScore:number|null;attentionLabel:'Higher activity'|'Moderate activity'|'Lower activity'|'Insufficient data';
  scoreBreakdown:{name:string;points:number;max:number;reason:string}[];
+ eventStudy?:import('./event-study').EventStudy;
  warnings:string[];dataSource:'Twelve Data';methodology:'Rules v1';
  closes:{date:string;close:number}[];
 };

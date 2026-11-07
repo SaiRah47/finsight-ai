@@ -314,3 +314,15 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
  .radar-metric strong{font-size:17px}
 }
 @media(prefers-reduced-motion:reduce){.radar-score-rail>div{transition:none!important}}
+
+/* Exploratory outcome study: no prediction styling or directional recommendation */
+.radar-study{background:#0f1425bf;border:1px solid #b8a6ff30;border-radius:15px;padding:15px;margin-bottom:14px}
+.radar-study-header{display:flex;justify-content:space-between;align-items:center;gap:9px}
+.radar-study-header strong{font-size:12px;color:#dbd2ff}
+.radar-study-header span{font-size:10px;color:#9b9cbf}
+.radar-study-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:14px}
+.radar-study-grid>div{display:grid;gap:6px;min-width:0}
+.radar-study-grid span{font-size:9px;color:#a4a9c6}
+.radar-study-grid strong{font-size:17px;color:#e7e5fa}
+.radar-study p{font-size:9px;color:#9096b8;line-height:1.6;margin:13px 0 0}
+.radar-no-events{font-size:11px!important;color:#c4bddd!important}

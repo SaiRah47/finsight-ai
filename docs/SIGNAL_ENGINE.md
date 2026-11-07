@@ -41,3 +41,10 @@ Higher scores can be produced by sharp **downward** moves and volatility. No ran
 - Scan two symbols and inspect score explanation.
 - Verify endpoints reject unauthorized requests and invalid symbols.
 - Run deterministic local unit tests in CI for flat-price series, positive/negative momentum, missing volume and short histories.
+
+## Exploratory forward-outcome event study
+- For every eligible historical observation starting after 61 bars, calculate a score using only observations up to and including that date.
+- If its attention score is 65 or greater, observe the close-to-close percent change five completed trading sessions later.
+- Show event count, average subsequent five-session percent change, fraction of positive event outcomes, and average unconditional five-session return across eligible observations.
+- These outcome windows can overlap, so observations are not independent. An observation at the closing price is not an assumed executable trade. No corporate-action adjustment, costs, slippage, confidence intervals, benchmark adjustment, out-of-sample evaluation, or predictive significance claims.
+- If there are no events, report no performance statistic. It must not show 0% performance for absent observations.

@@ -1,6 +1,7 @@
 import 'server-only';
 import {getHistory,validSymbol} from './market';
 import {calculateSignals,type SignalReport} from './signals';
+import {evaluateAttentionEvents} from './event-study';
 
 export type RadarResult={
  symbol:string;
@@ -20,6 +21,7 @@ export async function analyzeSymbol(symbol:string):Promise<SignalReport>{
  const completed=history.bars.filter(b=>b.date.slice(0,10)<today);
  if(completed.length===0)throw Error('No completed daily sessions available.');
  const report=calculateSignals(symbol,completed);
+ report.eventStudy=evaluateAttentionEvents(symbol,completed);
  report.warnings.unshift('Current US trading-day bar is excluded even after close to avoid treating partial volume as final.');
  return report;
 }
