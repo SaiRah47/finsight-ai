@@ -26,7 +26,7 @@ test('does not produce unsupported passages with unrelated words',()=>{
  assert.equal(results.length,0);
 });
 test('bounded extraction and section labels',()=>{
- const doc=extractFilingText('<p>'+('Revenue increased. '.repeat(25000))+'</p>');
+ const doc=extractFilingText('<p>'+('Revenue increased. '.repeat(65000))+'</p>');
  assert.ok(doc.text.length<=840000);
  assert.equal(doc.truncated,true);
  assert.ok(retrievePassages(doc,'Revenue',4).length<=4);

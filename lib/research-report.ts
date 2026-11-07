@@ -1,4 +1,4 @@
-import {auditClaims,summarizeClaimAudit,type ClaimAudit} from './claim-evaluation';
+import {auditClaims,summarizeClaimAudit,type ClaimAudit} from './claim-evaluation.ts';
 export type ReportSource={id:string;label:string;url:string;date:string|null;type?:string};
 export type ResearchSection={heading:string;observations:string[];kind:'market'|'risk'|'sec'|'limitations'};
 export type ResearchReport={
