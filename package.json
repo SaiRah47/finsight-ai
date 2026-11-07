@@ -14,7 +14,9 @@
     "react-dom": "^19.1.0",
     "@langchain/langgraph": "^0.4.0",
     "@langchain/core": "^0.3.0",
-    "zod": "^3.25.0"
+    "zod": "^3.25.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.0"
   },
   "devDependencies": {
     "typescript": "^5.9.0",
