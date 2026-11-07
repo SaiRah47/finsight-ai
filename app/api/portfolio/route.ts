@@ -16,9 +16,12 @@ export async function GET(){
  const quotes=[] as Awaited<ReturnType<typeof getQuote>>[];
  const errors:Record<string,string>={};
  // Limit bursts on the free-tier market provider. Missing quotes never invent a portfolio total.
- for(const record of holdings.slice(0,12)){
-  try{quotes.push(await getQuote(record.symbol))}
-  catch(e){errors[record.symbol]=e instanceof Error?e.message:'Quote unavailable'}
+ const priced=holdings.slice(0,12);
+ for(let start=0;start<priced.length;start+=3){
+  await Promise.all(priced.slice(start,start+3).map(async record=>{
+   try{quotes.push(await getQuote(record.symbol))}
+   catch(e){errors[record.symbol]=e instanceof Error?e.message:'Quote unavailable'}
+  }));
  }
  const valuation=valuePortfolio(holdings.map(h=>({symbol:h.symbol,shares:h.shares,costBasisPerShare:h.cost_basis_per_share})),quotes);
  return Response.json({holdings,valuation,quoteErrors:errors,

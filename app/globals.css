@@ -543,3 +543,11 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .atlas-hub-activity p{font-size:10px;color:#8b9db4}
 @media(max-width:950px){.atlas-phase6-kpis,.atlas-hub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.atlas-phase6-fields,.atlas-hub-activity{grid-template-columns:1fr}.atlas-phase6-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.atlas-phase6-panel{padding:13px}.atlas-hub{padding:14px}}
+
+/* On-demand official SEC filing discovery */
+.atlas-filing-feed{display:grid;gap:12px;margin-top:12px}
+.atlas-filing-group{border:1px solid #ffffff20;background:#121a2d;border-radius:13px;padding:14px;display:grid;gap:9px}
+.atlas-filing-group>strong{color:#d9d4f6;font-size:12px}
+.atlas-filing-group a{display:flex;justify-content:space-between;gap:14px;align-items:center;color:#abd4df;font-size:11px;border-bottom:1px solid #ffffff16;padding:8px 0}
+.atlas-filing-group a:hover{color:#87e4e8}
+.atlas-filing-group a span:last-child{font-size:10px;color:#87e4e8;text-align:right}

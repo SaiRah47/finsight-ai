@@ -17,7 +17,9 @@ export async function GET(request:Request){
   return Response.json({rules,note:'Alert rules are checked on demand; no automatic notification delivery is configured.'},{headers:{'Cache-Control':'no-store'}});
  const observations=new Map<string,{symbol:string;price:number|null;changePercent:number|null;volatility20:number|null;volumeRatio:number|null;asOf:string|null}>();
  const errors:Record<string,string>={};
- for(const symbol of [...new Set(rules.filter(r=>r.enabled).map(r=>r.symbol))].slice(0,6)){
+ const activeSymbols=[...new Set(rules.filter(r=>r.enabled).map(r=>r.symbol))].slice(0,4);
+ for(let start=0;start<activeSymbols.length;start+=2){
+ await Promise.all(activeSymbols.slice(start,start+2).map(async symbol=>{
   const needsHistorical=rules.some(r=>r.symbol===symbol&&r.enabled&&(r.metric==='volatility_above'||r.metric==='volume_ratio_above'));
   let price:number|null=null,changePercent:number|null=null,volatility20:number|null=null,volumeRatio:number|null=null,asOf:string|null=null;
   try{const q=await getQuote(symbol);price=q.price;changePercent=q.changePercent;asOf=q.asOf}
@@ -30,6 +32,7 @@ export async function GET(request:Request){
    asOf=report.lastDate;
   }catch(e){errors[symbol]=[errors[symbol],e instanceof Error?e.message:'History unavailable'].filter(Boolean).join('; ')}
   observations.set(symbol,{symbol,price,changePercent,volatility20,volumeRatio,asOf});
+ }));
  }
  const assessments=rules.map(r=>evaluateAlert(r,observations.get(r.symbol)??null));
  return Response.json({rules,assessments,errors,evaluatedAt:new Date().toISOString(),
