@@ -80,35 +80,20 @@ export function retrievePassages(doc:FilingDocument,question:string,limit=4):Fil
  if(!terms.length||!chunks.length)return [];
  const byTerm=new Map<string,number>();
  for(const term of terms)byTerm.set(term,chunks.filter(chunk=>chunk.text.toLowerCase().includes(term)).length);
- const explicitTerms=(question.toLowerCase().match(/[a-z][a-z0-9-]{2,}/g)||[])
-  .filter(x=>!ignored.has(x));
+ const explicitTerms=(question.toLowerCase().match(/[a-z][a-z0-9-]{2,}/g)||[]).filter(x=>!ignored.has(x));
  const explicit=new Set(explicitTerms);
  const scored=chunks.map(chunk=>{
   const lower=chunk.text.toLowerCase(),heading=chunk.section.toLowerCase(),matched:string[]=[];
   let score=0,matchedExplicit=0;
   for(const term of terms){
-   const word=new RegExp('(^|[^a-z0-9])'+term.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\ const scored=chunks.map(chunk=>{
-  const lower=chunk.text.toLowerCase(),heading=chunk.section.toLowerCase(),matched:string[]=[];
-  let score=0;
-  for(const term of terms){
-   const word=new RegExp('(^|[^a-z0-9])'+term.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\$&')+'(?=$|[^a-z0-9])','g');
-   const hits=[...lower.matchAll(word)].length;
-   if(!hits)continue;
-   matched.push(term);
-   const idf=Math.log(1+(chunks.length+1)/(1+(byTerm.get(term)||0)));
-   score+=idf*(1+Math.log1p(Math.min(hits,12)));
-   if(heading.includes(term))score+=2.5;
-  }
-  if(/risk|uncertain/i.test(question)&&/item\s+1a/i.test(heading))score+=4;
-  return {...chunk,score:Number(score.toFixed(3)),matchedTerms:matched};
- }).filter(chunk=>chunk.score>0);')+'(?=$|[^a-z0-9])','g');
+   // Terms originate in our strict alphanumeric/hyphen tokenizer; no regex interpolation of raw user strings.
+   const word=new RegExp('(^|[^a-z0-9])'+term+'(?=$|[^a-z0-9])','g');
    const hits=[...lower.matchAll(word)].length;
    if(!hits)continue;
    matched.push(term);
    const direct=explicit.has(term);
    if(direct)matchedExplicit++;
    const idf=Math.log(1+(chunks.length+1)/(1+(byTerm.get(term)||0)));
-   // Direct question terms outrank broad synonym expansions, and repeats saturate.
    score+=idf*(direct?2.2:0.55)*(1+Math.log1p(Math.min(hits,4)));
    if(heading.includes(term))score+=(direct?2:0.6);
   }
