@@ -7,8 +7,8 @@ export type FilingPassage={
  score:number;matchedTerms:string[];
 };
 export type FilingDocument={text:string;sections:{heading:string;start:number;end:number}[];truncated:boolean};
-const CAP=280_000;
-const MAX_CHUNKS=240;
+const CAP=840_000;
+const MAX_CHUNKS=900;
 function decodeEntities(raw:string):string{
  return raw.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp|ndash|mdash|rsquo|lsquo);/gi,(value,body:string)=>{
   const names:Record<string,string>={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',ndash:'–',mdash:'—',rsquo:"'",lsquo:"'"};
@@ -21,7 +21,7 @@ function decodeEntities(raw:string):string{
 }
 export function extractFilingText(html:string):FilingDocument{
  // Reject highly malformed/untrusted wrappers, scripts, and EDGAR inline XBRL noise.
- const cleaned=html.slice(0,3_500_000)
+ const cleaned=html.slice(0,8_000_000)
   .replace(/<!--[\s\S]*?-->/g,' ')
   .replace(/<(script|style|head|noscript|svg|xml|ix:header|ix:resources|ix:hidden)\b[^>]*>[\s\S]*?<\/\1\s*>/gi,' ')
   .replace(/<br\s*\/?\s*>/gi,'\n')
@@ -33,14 +33,14 @@ export function extractFilingText(html:string):FilingDocument{
  const sections:{heading:string;start:number;end:number}[]=[];
  const regex=/(?:^|\n)\s*(ITEM\s+(?:1A|1B|1C|2|3|7A?|8|9A|9B|10|11|12|13|14|15)\s*[.:-]?\s*[^\n]{0,105})/gim;
  let hit:RegExpExecArray|null;
- while((hit=regex.exec(text))&&sections.length<100){
+ while((hit=regex.exec(text))&&sections.length<220){
   const heading=hit[1].trim().slice(0,112),start=hit.index+hit[0].indexOf(hit[1]);
   if(text.slice(start,start+500).length===0)continue;
   if(sections.length&&start-sections[sections.length-1].start<100)continue;
   sections.push({heading,start,end:text.length});
  }
  for(let i=0;i<sections.length-1;i++)sections[i].end=sections[i+1].start;
- return {text,sections,truncated:html.length>3_500_000||cleaned.length>CAP};
+ return {text,sections,truncated:html.length>8_000_000||cleaned.length>CAP};
 }
 const ignored=new Set(['the','and','for','are','what','why','has','have','was','with','which','how','about','from','this','that','their','please','show','find','latest','company','nvidia','apple','microsoft','amazon','report','filing','filings','sec','stock','shares','what','recent','its','they']);
 export function queryTerms(query:string):string[]{

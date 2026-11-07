@@ -27,11 +27,19 @@ test('does not produce unsupported passages with unrelated words',()=>{
 });
 test('bounded extraction and section labels',()=>{
  const doc=extractFilingText('<p>'+('Revenue increased. '.repeat(25000))+'</p>');
- assert.ok(doc.text.length<=280000);
+ assert.ok(doc.text.length<=840000);
  assert.equal(doc.truncated,true);
  assert.ok(retrievePassages(doc,'Revenue',4).length<=4);
 });
 test('query expansion avoids generic filler words',()=>{
  assert.ok(queryTerms('Why is NVIDIA volatility high?').includes('risk'));
  assert.equal(queryTerms('the and what how').length,0);
+});
+
+test('extracts late sections beyond former 280k-character cap',()=>{
+ const source='<p>'+('Business background and management discussion. '.repeat(7500))+'</p>'+
+  '<h2>Item 1A. Risk Factors</h2><p>Regulatory export controls may restrict supply of key systems. '.repeat(15)+'</p>';
+ const doc=extractFilingText(source);
+ assert.ok(doc.text.includes('Regulatory export controls'));
+ assert.ok(retrievePassages(doc,'Regulatory export controls',3).some(p=>p.text.includes('Regulatory export controls')));
 });
