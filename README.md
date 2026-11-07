@@ -42,3 +42,7 @@ This is the **GitHub-hosted foundation** of FinSight, not yet the complete earli
 ## Real market data (Milestone 2)
 
 The Markets tab now includes US equity symbol search, server-side quotes, six selectable historical chart ranges, and quote stats. The overview uses the SPY benchmark, while saved watchlist symbols are looked up through authenticated APIs. These features require `TWELVE_DATA_API_KEY` in Vercel, under the free or paid entitlement of your Twelve Data account. Without a key the UI shows a connection prompt, never invented quotes. See [market-data setup](docs/MARKET_DATA_SETUP.md). Market-data API routes require an authenticated FinSight owner and use server-side caching. Quote timestamps are provider-reported and should not be assumed real-time.
+
+## Milestone 4 — SEC research intelligence
+
+FinSight now includes a dedicated SEC EDGAR filings view, first-party issuer CIK lookup, recent 10-K/10-Q/8-K filing links, and selected XBRL financial facts. Its LangGraph workflow combines filing metadata with historical market risk where the question warrants it, displays timed node execution and verified source links, and saves results to Supabase. AI prose synthesis is optional and disabled by default. **SEC access requires an application-specific User-Agent with a real contact email configured only in Vercel**. See [Milestone 4 setup and limitations](docs/SEC_RESEARCH.md).
