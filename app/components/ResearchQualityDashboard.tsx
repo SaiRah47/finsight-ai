@@ -1,9 +1,11 @@
 'use client';
 import {useState} from 'react';
+import {REVIEW_PROMPTS} from '@/lib/review-queue';
 type NodeSummary={node:string;samples:number;p50Ms:number|null;p95Ms:number|null;failures:number};
 type Dashboard={runs:number;traces:number;sourceBearing:number;sourceCoverage:number|null;statuses:Record<string,number>;perNode:NodeSummary[];failures:Record<string,number>;reviews:{count:number;supported:number;unsupported:number;uncertain:number};limitations:string[];generatedAt:string};
 export default function ResearchQualityDashboard(){
  const [data,setData]=useState<Dashboard|null>(null),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const [issuer,setIssuer]=useState<'NVDA'|'MSFT'|'AAPL'>('NVDA'),[copied,setCopied]=useState('');
  async function load(){
   setLoading(true);setError('');
   try{
@@ -40,6 +42,11 @@ export default function ResearchQualityDashboard(){
    </div></div>
    <details className="sec-caveats"><summary>Sampling and reliability limitations</summary>{data.limitations.map((line,i)=><p key={i}>{line}</p>)}</details>
   </>}
+  <div className="quality-panel"><h3>Human review candidate queue</h3>
+   <p>36 unlabeled candidate questions for NVIDIA, Microsoft, and Apple. These are prompts, not pre-verified SEC facts or completed annotations. Use the SEC filings tab to retrieve and judge evidence; counts appear above after saving.</p>
+   <div className="benchmark-issuers">{(['NVDA','MSFT','AAPL'] as const).map(x=><button key={x} type="button" aria-pressed={issuer===x} className={issuer===x?'active':''} onClick={()=>setIssuer(x)}>{x}</button>)}</div>
+   <div className="review-queue">{REVIEW_PROMPTS.filter(q=>q.symbol===issuer).map(prompt=><div key={prompt.id}><span>{prompt.id}{prompt.intent==='abstention-probe'?' · Absence probe':''}</span><p>{prompt.question}</p><button type="button" onClick={()=>{void navigator.clipboard.writeText(prompt.question).then(()=>setCopied(prompt.id)).catch(()=>setCopied(''))}}>{copied===prompt.id?'Copied':'Copy question'}</button></div>)}</div>
+  </div>
   <div className="quality-panel"><h3>Evaluation program</h3>
    <p>Our 11 synthetic SEC fixtures run in GitHub Actions. A separate source-verified three-company filing lab compares weighted lexical retrieval and BM25. Human-reviewed cases accumulate only when you explicitly label actual retrieved passages; no labels are automatically invented.</p>
    <p className="muted">Open SEC filings to review passages. Use the Execution Studio briefing to review generated claims. The private Supabase evaluation table must be created once before labels can be saved.</p>
