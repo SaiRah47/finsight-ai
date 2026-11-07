@@ -53,19 +53,19 @@ function ChartArea({bars,period}:{bars:Bar[];period:Period}){
   <div className="market-chart-caption">{bars.length} observations · {rising?'Upward':'Downward'} across selected window · Source: Twelve Data</div>
  </div>;
 }
-export default function MarketExplorer(){
- const [query,setQuery]=useState(''),[symbol,setSymbol]=useState('AAPL'),[period,setPeriod]=useState<Period>('1M');
+export default function MarketExplorer({selectedSymbol='AAPL'}:{selectedSymbol?:string}){
+ const [query,setQuery]=useState(''),[symbol,setSymbol]=useState(selectedSymbol),[period,setPeriod]=useState<Period>('1M');
  const [matches,setMatches]=useState<Match[]>([]),[searching,setSearching]=useState(false);
  const [quote,setQuote]=useState<Quote|null>(null),[history,setHistory]=useState<History|null>(null);
  const [quoteError,setQuoteError]=useState(''),[historyError,setHistoryError]=useState(''),[searchError,setSearchError]=useState('');
  const [loadingQuote,setLoadingQuote]=useState(true),[loadingHistory,setLoadingHistory]=useState(true);
  useEffect(()=>{
-  const controller=new AbortController();setLoadingQuote(true);setQuoteError('');
+  const controller=new AbortController();setLoadingQuote(true);setQuoteError('');setQuote(null);
   void getJson<Quote>('/api/market/quote?symbol='+encodeURIComponent(symbol),controller.signal).then(setQuote).catch(e=>{if(!controller.signal.aborted){setQuote(null);setQuoteError(e.message)}}).finally(()=>{if(!controller.signal.aborted)setLoadingQuote(false)});
   return ()=>controller.abort();
  },[symbol]);
  useEffect(()=>{
-  const controller=new AbortController();setLoadingHistory(true);setHistoryError('');
+  const controller=new AbortController();setLoadingHistory(true);setHistoryError('');setHistory(null);
   void getJson<History>('/api/market/history?symbol='+encodeURIComponent(symbol)+'&period='+period,controller.signal).then(setHistory).catch(e=>{if(!controller.signal.aborted){setHistory(null);setHistoryError(e.message)}}).finally(()=>{if(!controller.signal.aborted)setLoadingHistory(false)});
   return ()=>controller.abort();
  },[symbol,period]);
@@ -78,6 +78,7 @@ export default function MarketExplorer(){
   },550);
   return ()=>{clearTimeout(timeout);controller.abort()};
  },[query]);
+ useEffect(()=>{setSymbol(selectedSymbol)},[selectedSymbol]);
  const select=(s:string)=>{setSymbol(s);setQuery('');setMatches([])};
  return <section className="market-explorer">
   <div className="market-section-head"><div><div className="eyebrow">MARKETS / RESEARCH TERMINAL</div><h2>Explore the market <span className="gradient">with clarity.</span></h2><p>Search US stocks, examine provider-reported quotes, and analyze historical market movement.</p></div><span className="market-provider-tag"><span className="market-provider-dot"/> TWELVE DATA · SERVER-SIDE</span></div>
@@ -104,6 +105,6 @@ export default function MarketExplorer(){
    <div className="market-stat"><span>Volume</span><strong>{quantity(quote?.volume??null)}</strong></div>
    <div className="market-stat"><span>Exchange</span><strong>{quote?.exchange||'—'}</strong></div>
   </div>
-  <div className="market-data-footer"><span>Source: Twelve Data · Latest provider observation: {quote?.asOf||'Not available'} · Retrieved: {quote?.fetchedAt?new Date(quote.fetchedAt).toLocaleString():'—'}</span><span>Provider availability and quote delay vary by plan and exchange. Not investment advice.</span></div>
+  <div className="market-data-footer"><span>Source: Twelve Data · Latest provider observation: {quote?.asOf||'Not available'} · Retrieved: {quote?.fetchedAt?new Date(quote.fetchedAt).toLocaleString():'—'}</span><span>The provider's observation timestamp may lag behind the current time. Never assume quotes are live. Not investment advice.</span></div>
  </section>;
 }

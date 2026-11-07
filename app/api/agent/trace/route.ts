@@ -22,7 +22,7 @@ export async function POST(request:Request){
     send('trace',{executionId,step:'router',status:'running',at:new Date().toISOString()});
     const result=await runDemoResearch(parsed.data.question);
     send('trace',{executionId,step:'router',status:'complete',route:result.route,at:new Date().toISOString()});
-    send('trace',{executionId,step:result.route,status:'complete',evidenceCount:result.evidence?.length??0,at:new Date().toISOString()});
+    send('trace',{executionId,step:result.route,status:result.source==='market-data'?'complete':'unavailable',source:result.source,symbol:result.symbol,asOf:result.asOf,evidenceCount:result.evidence?.length??0,at:new Date().toISOString()});
     send('trace',{executionId,step:'synthesize',status:'complete',at:new Date().toISOString()});
     let persisted=false;
     if(owner){
@@ -34,7 +34,7 @@ export async function POST(request:Request){
       send('trace',{executionId,step:'persistence',status:persisted?'complete':'error'});
      }
     }
-    send('result',{executionId,answer:result.answer,mode:'demo',persisted});
+    send('result',{executionId,answer:result.answer,mode:result.source==='market-data'?'provider-backed':'limited',source:result.source,symbol:result.symbol,asOf:result.asOf,persisted});
    }catch{send('error',{message:'Workflow failed'});}finally{controller.close()}
   })();
  }});

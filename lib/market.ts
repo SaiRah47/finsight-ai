@@ -28,23 +28,28 @@ function num(input:unknown):number|null {
 export class MarketError extends Error {
  constructor(message:string,public status=502){super(message)}
 }
+// A short per-instance circuit breaker reduces repeated paid-credit requests after rate limiting.
+// Serverless instances do not share state; this is supplemental to the provider's quotas.
+let throttledUntil=0;
+const RATE_LIMIT_NOTICE='Twelve Data credit limit reached. Try again after the provider quota resets.';
 async function twelve(path:string,params:Record<string,string>,ttl:number):Promise<Record<string,unknown>> {
  const key=process.env.TWELVE_DATA_API_KEY;
  if(!key)throw new MarketError('Market data is not connected. Add TWELVE_DATA_API_KEY to Vercel and redeploy.',503);
+ if(Date.now()<throttledUntil)throw new MarketError(RATE_LIMIT_NOTICE,429);
  const url=new URL('https://api.twelvedata.com/'+path);
  for(const [k,v] of Object.entries(params))url.searchParams.set(k,v);
  url.searchParams.set('apikey',key);
  let res:Response;
  try{res=await fetch(url,{next:{revalidate:ttl},signal:AbortSignal.timeout(12000)})}
  catch{throw new MarketError('Market provider could not be reached. Try again shortly.',502)}
- if(!res.ok)throw new MarketError(res.status===429?'Market-data rate limit reached. Try again after the provider resets.':'Market provider returned HTTP '+res.status,res.status===429?429:502);
+ if(!res.ok){if(res.status===429){throttledUntil=Date.now()+60_000;throw new MarketError(RATE_LIMIT_NOTICE,429)}throw new MarketError('Market provider is temporarily unavailable (HTTP '+res.status+').',502)}
  let body:unknown;try{body=await res.json()}catch{throw new MarketError('Market provider returned an unreadable response.')}
  if(!body||typeof body!=='object'||Array.isArray(body))throw new MarketError('Market provider returned unexpected data.');
  const obj=body as Record<string,unknown>;
  if(obj.status==='error'||obj.code){
   const code=num(obj.code);
-  const message=String(obj.message||'Market request failed.');
-  throw new MarketError(message,code===429?429:code===404?404:502);
+  if(code===429){throttledUntil=Date.now()+60_000;throw new MarketError(RATE_LIMIT_NOTICE,429)}
+  throw new MarketError(code===404?'Symbol or dataset not found.':'Market data is unavailable for this instrument or subscription.',code===404?404:502);
  }
  return obj;
 }

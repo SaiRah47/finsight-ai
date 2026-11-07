@@ -4,7 +4,7 @@ import {browserDb} from '@/lib/supabase/browser';
 type SymbolRow={id:string;symbol:string;created_at:string};
 type Run={id:string;question:string;route:string;answer:string;created_at:string};
 type Trace={id:string;run_id:string;events:unknown;created_at:string};
-export default function PersonalDataPanel({mode}:{mode:'watchlist'|'history'}){
+export default function PersonalDataPanel({mode,onSelectSymbol}:{mode:'watchlist'|'history';onSelectSymbol?:(symbol:string)=>void}){
  const db=browserDb();
  const [symbols,setSymbols]=useState<SymbolRow[]>([]),[runs,setRuns]=useState<Run[]>([]),[traces,setTraces]=useState<Trace[]>([]);
  const [symbol,setSymbol]=useState(''),[error,setError]=useState(''),[loading,setLoading]=useState(false);
@@ -43,7 +43,7 @@ export default function PersonalDataPanel({mode}:{mode:'watchlist'|'history'}){
  return <section className="vault-card"><div className="sectiontitle"><h2>{mode==='watchlist'?'Your saved watchlist':'Research & trace history'}</h2><button className="pill" disabled={loading} onClick={()=>void load()}>{loading?'Loading…':'Refresh ↻'}</button></div>
  {mode==='watchlist'?<><form onSubmit={add} className="vault-add"><label htmlFor="symbol-input">Add a stock or ETF</label><div className="inputrow"><input id="symbol-input" value={symbol} onChange={e=>setSymbol(e.target.value)} placeholder="NVDA" maxLength={12}/><button className="primary">Add symbol</button></div></form>
  {symbols.length===0&&<p className="muted">No saved symbols. Add a ticker to build your personal watchlist.</p>}
- {symbols.map(row=><div className="watchrow" key={row.id}><span className="ticker">{row.symbol}</span><button className="pill" onClick={()=>void remove(row.id)}>Remove</button></div>)}</>:
+ {symbols.map(row=><div className="watchrow" key={row.id}><button className="ticker saved-symbol-link" type="button" onClick={()=>onSelectSymbol?.(row.symbol)} aria-label={'Open '+row.symbol+' price chart'}>{row.symbol} <span aria-hidden="true">↗</span></button><button className="pill" onClick={()=>void remove(row.id)}>Remove</button></div>)}</>:
  <>{runs.length===0&&<p className="muted">No saved research yet. Execute a LangGraph workflow and refresh this panel.</p>}
  {runs.map(run=><details className="history-row" key={run.id}><summary><strong>{run.question}</strong><span>{new Date(run.created_at).toLocaleString()} · {run.route}</span></summary><p>{run.answer}</p><pre>{JSON.stringify(traces.find(t=>t.run_id===run.id)?.events??[],null,2)}</pre></details>)}</>}
  {error&&<p className="vault-error" role="alert">{error}</p>}</section>;

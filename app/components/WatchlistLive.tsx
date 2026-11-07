@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 import {browserDb} from '@/lib/supabase/browser';
 type Quote={symbol:string;price:number;changePercent:number|null;name:string;currency:string;asOf:string|null};
 type Result={symbol:string;quote:Quote|null;error:string|null};
-export default function WatchlistLive(){
+export default function WatchlistLive({onSelect}:{onSelect:(symbol:string)=>void}){
  const [symbols,setSymbols]=useState<string[]>([]);
  const [results,setResults]=useState<Result[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState('');
@@ -29,7 +29,7 @@ export default function WatchlistLive(){
   void run();return ()=>{active=false};
  },[]);
  return <div className="card market-watchlist-card"><div className="sectiontitle"><h2>Saved watchlist · market pulse</h2><span className="pill">Latest available</span></div>
- {loading?<div className="market-skeleton" style={{height:110}}/>:error?<div className="market-watch-error">{error}</div>:!symbols.length?<p className="muted">Your watchlist is empty. Add symbols from the Markets tab to see their prices here.</p>:results.map(r=><div className="watchrow" key={r.symbol}><div><strong className="ticker">{r.symbol}</strong><small style={{display:'block',marginTop:3}}>{r.quote?.name||'No quote'}</small></div><div className="market-watch-right"><strong>{r.quote?new Intl.NumberFormat('en-US',{style:'currency',currency:r.quote.currency||'USD'}).format(r.quote.price):'—'}</strong><small className={r.quote?.changePercent!==null&&r.quote?.changePercent!==undefined&&r.quote.changePercent<0?'down':'up'}>{r.quote?.changePercent!==null&&r.quote?.changePercent!==undefined?(r.quote.changePercent>0?'+':'')+r.quote.changePercent.toFixed(2)+'%':r.error||'Change unavailable'}</small></div></div>)}
+ {loading?<div className="market-skeleton" style={{height:110}}/>:error?<div className="market-watch-error">{error}</div>:!symbols.length?<p className="muted">Your watchlist is empty. Add symbols from the Markets tab to see their prices here.</p>:results.map(r=><div className="watchrow" key={r.symbol}><div><button className="ticker saved-symbol-link" onClick={()=>onSelect(r.symbol)} aria-label={'Explore '+r.symbol+' historical price chart'}>{r.symbol} ↗</button><small style={{display:'block',marginTop:3}}>{r.quote?.name||'No quote'}</small></div><div className="market-watch-right"><strong>{r.quote?new Intl.NumberFormat('en-US',{style:'currency',currency:r.quote.currency||'USD'}).format(r.quote.price):'—'}</strong><small className={r.quote?.changePercent!==null&&r.quote?.changePercent!==undefined&&r.quote.changePercent<0?'down':'up'}>{r.quote?.changePercent!==null&&r.quote?.changePercent!==undefined?(r.quote.changePercent>0?'+':'')+r.quote.changePercent.toFixed(2)+'%':r.error||'Change unavailable'}</small></div></div>)}
  <p className="market-watch-disclaimer">Saved symbols from Supabase · Quotes from Twelve Data, subject to provider delay. Reload to refresh.</p>
  </div>;
 }

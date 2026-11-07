@@ -241,3 +241,8 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .market-snapshot>.pill{align-self:flex-start;margin-top:12px}
 .snapshot-unavailable{display:grid;justify-items:start;gap:12px;padding:24px 5px;font-size:12px;color:#a4a9c4;line-height:1.7}
 .snapshot-unavailable strong{font-size:14px;color:#e5e4f5}
+
+/* Saved instruments are navigational, not decorative. */
+.saved-symbol-link{background:transparent;border:0;color:#bdaeff;cursor:pointer;font-size:12px;padding:7px 0;text-align:left}
+.saved-symbol-link:hover{text-decoration:underline;color:#87e4e8}
+.saved-symbol-link:focus-visible{outline:2px solid #87e4e8;outline-offset:3px;border-radius:5px}
