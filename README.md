@@ -38,3 +38,7 @@ Do not commit credentials, brokerage data, personal holdings, private planning d
 ## Development status
 
 This is the **GitHub-hosted foundation** of FinSight, not yet the complete earlier v3 design archive. The full Spectrum/Execution Studio prototype remains available as a separate local project bundle for subsequent migration.
+
+## Real market data (Milestone 2)
+
+The Markets tab now includes US equity symbol search, server-side quotes, six selectable historical chart ranges, and quote stats. The overview uses the SPY benchmark, while saved watchlist symbols are looked up through authenticated APIs. These features require `TWELVE_DATA_API_KEY` in Vercel, under the free or paid entitlement of your Twelve Data account. Without a key the UI shows a connection prompt, never invented quotes. See [market-data setup](docs/MARKET_DATA_SETUP.md). Market-data API routes require an authenticated FinSight owner and use server-side caching. Quote timestamps are provider-reported and should not be assumed real-time.
