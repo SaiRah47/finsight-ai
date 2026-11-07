@@ -4,10 +4,17 @@ type Metric='price_above'|'price_below'|'daily_change_abs'|'volatility_above'|'v
 type Rule={id:string;symbol:string;metric:Metric;threshold:number;enabled:boolean};
 type Assessment={ruleId:string;symbol:string;metric:Metric;threshold:number;value:number|null;triggered:boolean;reason:string;asOf:string|null};
 type Payload={rules:Rule[];assessments?:Assessment[];errors?:Record<string,string>;evaluatedAt?:string;note:string};
+type FilingCheck={symbolsChecked:number;cutoff:string;checkedAt:string;discovered:{symbol:string;name:string;filings:{accession:string;form:string;filed:string;url:string;recent:boolean}[];error:string|null}[];caveat:string};
 const labels:Record<Metric,string>={price_above:'Price above (USD)',price_below:'Price below (USD)',daily_change_abs:'Absolute daily move (%)',volatility_above:'20-session annualized volatility (%)',volume_ratio_above:'Relative volume (×)'};
 export default function AlertsIntelligence(){
  const [data,setData]=useState<Payload|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const [symbol,setSymbol]=useState('NVDA'),[metric,setMetric]=useState<Metric>('daily_change_abs'),[threshold,setThreshold]=useState('5');
+ const [filings,setFilings]=useState<FilingCheck|null>(null),[filingsBusy,setFilingsBusy]=useState(false),[filingsError,setFilingsError]=useState('');
+ async function checkFilings(){
+  setFilingsBusy(true);setFilingsError('');
+  try{const res=await fetch('/api/alerts/filings',{cache:'no-store'}),json=await res.json();if(!res.ok)throw Error(json.error||'SEC check unavailable');setFilings(json)}
+  catch(e){setFilingsError(e instanceof Error?e.message:'SEC check unavailable')}finally{setFilingsBusy(false)}
+ }
  async function load(evaluate=false){
   setBusy(true);setError('');
   try{const r=await fetch('/api/alerts'+(evaluate?'?evaluate=true':''),{cache:'no-store'}),body=await r.json();if(!r.ok)throw Error(body.error||'Alert rules unavailable');setData(body)}
@@ -41,6 +48,16 @@ export default function AlertsIntelligence(){
     <div><strong className={a?.triggered?'atlas-triggered':''}>{!a?'Not evaluated':a.triggered?'Threshold exceeded':a.value===null?'Not evaluable':'Within threshold'}</strong><span>{a?((a.value===null?'No metric':a.value.toFixed(2))+' · '+(a.asOf||'No observation time')):'Run Check rules now to evaluate'}</span></div>
     <button className="pill" disabled={busy} onClick={()=>void remove(r.id)}>Remove</button>
    </div>})}</div>
+  </div>
+  <div className="atlas-phase6-panel"><div className="sectiontitle"><h3>Recent watchlist SEC filings</h3><button className="pill" disabled={filingsBusy} onClick={()=>void checkFilings()}>{filingsBusy?'Checking…':'Check official filings ↗'}</button></div>
+   <p className="atlas-hint">Check the three newest saved watchlist tickers for recent 10-K, 10-Q or 8-K submissions. This may consume SEC requests.</p>
+   {filingsError&&<p className="market-alert" role="alert">{filingsError}</p>}
+   {filings&&<div className="atlas-filing-feed">{!filings.symbolsChecked&&<p>No watchlist symbols. Add tickers in Markets first.</p>}
+    {filings.discovered.map(item=><div key={item.symbol} className="atlas-filing-group"><strong>{item.symbol} · {item.name}</strong>
+     {item.error&&<p className="atlas-warning">{item.error}</p>}
+     {item.filings.map(row=><a key={row.accession} href={row.url} target="_blank" rel="noreferrer"><span>{row.form} · filed {row.filed}</span><span>{row.recent?'Filed in last 7 days · ':''}Read SEC ↗</span></a>)}
+    </div>)}<p className="atlas-hint">{filings.caveat}</p>
+   </div>}
   </div><p className="atlas-disclaimer">These are manually checked conditions, not background notifications. No email, push or SMS delivery is configured, and no continuously monitored alerting is claimed.</p>
  </section>;
 }
