@@ -53,7 +53,7 @@ export async function runInvestorCycle(owner:string):Promise<{cycleDate:string;o
  if(aError)throw Error('Could not read arena agents.');
  const outcomes:DecisionOutcome[]=[];
  for(const agent of (agents||[]).filter(a=>a.league==='investor'&&a.status==='active')){
-  const {count,error:historyError}=await db.from('arena_decisions').select('id',{count:'exact',head:true}).eq('agent_id',agent.id);
+  const {count,error:historyError}=await db.from('arena_orders').select('id',{count:'exact',head:true}).eq('agent_id',agent.id);
   if(historyError){outcomes.push({agent:agent.slug,action:'hold',symbol:'-',reason:'Decision history unavailable; skipped.'});continue}
   const symbol=selectInvestorCandidate(agent.slug,count||0);
   if(!symbol)continue;
