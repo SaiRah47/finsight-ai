@@ -1,5 +1,6 @@
 import { Annotation, StateGraph, START, END } from '@langchain/langgraph';
 import {getQuote,MarketError,validSymbol} from '@/lib/market';
+import {analyzeSymbol} from '@/lib/radar';
 
 type Route='market'|'risk'|'filings';
 const symbols=['AAPL','NVDA','MSFT','AMZN','GOOGL','GOOG','TSLA','META','SPY','QQQ','AMD','NFLX'];
@@ -33,7 +34,20 @@ const graph=new StateGraph(ResearchState)
   return {source:'unavailable' as const,symbol,asOf:null,evidence:[error instanceof MarketError?error.message:'Market quote could not be retrieved.']};
  }
 })
-.addNode('risk',async()=>({source:'unavailable' as const,evidence:['Portfolio risk analysis is not connected to verified holdings yet. No exposure or volatility score has been inferred.']}))
+.addNode('risk',async state=>{
+ const symbol=findTicker(state.question);
+ if(!symbol)return {source:'unavailable' as const,symbol:null,asOf:null,evidence:['A portfolio-level risk analysis requires actual positions, which are not connected. For historical single-stock volatility or drawdown, include a ticker such as AAPL.']};
+ try{
+  const report=await analyzeSymbol(symbol);
+  const volatility=report.metrics.find(m=>m.id==='volatility20')?.value??null;
+  const drawdown=report.metrics.find(m=>m.id==='drawdown90')?.value??null;
+  return {source:'market-data' as const,symbol,asOf:report.lastDate,evidence:[
+   `Twelve Data daily bars for ${symbol}: ${report.sampleCount} completed sessions through ${report.lastDate}.`,
+   `20-session annualized realized volatility: ${volatility===null?'insufficient observations':volatility+'%'}; 90-session maximum historical drawdown: ${drawdown===null?'insufficient observations':drawdown+'%'}.`,
+   'These are historical single-instrument statistics, not portfolio exposure, future risk probability, or a trade signal.'
+  ]};
+ }catch(error){return {source:'unavailable' as const,symbol,asOf:null,evidence:[error instanceof Error?error.message:'Historical risk metrics unavailable.']};}
+})
 .addNode('filings',async()=>({source:'unavailable' as const,evidence:['SEC filings have not been retrieved. No filing analysis can be supported yet.']}))
 .addNode('synthesize',async state=>({answer:(state.source==='market-data'?'Verified market observation: ':'Research status: ')+state.evidence.join(' ')+' Quote timestamps are provider-reported and may be delayed. This is informational, not investment advice.'}))
 .addEdge(START,'router')

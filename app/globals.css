@@ -246,3 +246,71 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 .saved-symbol-link{background:transparent;border:0;color:#bdaeff;cursor:pointer;font-size:12px;padding:7px 0;text-align:left}
 .saved-symbol-link:hover{text-decoration:underline;color:#87e4e8}
 .saved-symbol-link:focus-visible{outline:2px solid #87e4e8;outline-offset:3px;border-radius:5px}
+
+/* Milestone 3 — historical activity radar */
+.radar-screen{display:grid;gap:22px;min-width:0;padding-bottom:30px}
+.radar-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:22px}
+.radar-intro h2{font-size:clamp(29px,4.5vw,53px);letter-spacing:-.055em;line-height:1.12;margin:10px 0}
+.radar-intro p{color:#a5a9c5;font-size:12px;line-height:1.8;max-width:630px}
+.radar-method-pill{border:1px solid #b6aaff36;border-radius:999px;background:#b8a6ff11;color:#c9bfff;white-space:nowrap;padding:11px 14px;font-size:10px}
+.radar-scan-control{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;border:1px solid #ffffff1b;background:linear-gradient(115deg,#25203cd6,#171b2ddb);border-radius:19px;padding:22px}
+.radar-input-area{display:grid;gap:9px;flex:1 1 240px}
+.radar-input-area label{font-size:11px;color:#b4b6d2}
+.radar-input-area input{width:100%;min-width:0;border:1px solid #ffffff32;background:#0e1121;border-radius:12px;color:#f8f6ff;padding:13px 15px;font:700 13px Manrope,system-ui,sans-serif;letter-spacing:.03em}
+.radar-input-area input:focus{outline:2px solid #87e4e8;outline-offset:1px}
+.radar-buttons{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.radar-scan-control>p{flex-basis:100%;color:#959bbb;font-size:10px;line-height:1.6;margin:0}
+.radar-loading{display:grid;gap:15px;font-size:11px;color:#abb1ca}
+.radar-empty{border:1px dashed #8277a650;background:#1517288c;border-radius:19px;text-align:center;padding:58px 22px;display:grid;justify-items:center;gap:8px}
+.radar-empty>span{font-size:46px;color:#b8a6ff}
+.radar-empty h3{font-size:20px;letter-spacing:-.03em;margin:0}
+.radar-empty p{font-size:12px;color:#a6a9c5;max-width:460px;line-height:1.7}
+.radar-summary{display:flex;gap:15px;align-items:center;flex-wrap:wrap;color:#a5aac6;font-size:11px}
+.radar-summary strong{color:#d8cffc;font-size:12px}
+.radar-result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.radar-card{min-width:0;border:1px solid #ffffff1b;border-radius:21px;background:linear-gradient(150deg,#201b37,#15192b 78%);padding:23px}
+.radar-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.radar-card-head small{font-size:9px;color:#aca3d5;letter-spacing:1.8px}
+.radar-card-head h3{font-size:27px;letter-spacing:-.035em;margin:5px 0 0}
+.radar-chart-link{border:1px solid #b8a6ff46;background:#b8a6ff13;color:#d1c3ff;font-size:10px;padding:9px 12px;border-radius:999px}
+.radar-chart-link:hover{background:#b8a6ff29}
+.radar-score-line{margin:22px 0 9px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.radar-score-line>div{display:grid;gap:6px}
+.radar-score-line strong{font-size:38px;letter-spacing:-.05em;color:#f1eaff}
+.radar-score-line strong span{font-size:13px;color:#aaa7c7;letter-spacing:0}
+.radar-score-line small{color:#a2a5c2;font-size:11px}
+.radar-history-date{text-align:right;font-size:10px;color:#a0a4bd;line-height:1.6}
+.radar-score-rail{height:6px;border-radius:99px;background:#393451;overflow:hidden}
+.radar-score-rail>div{height:100%;background:linear-gradient(90deg,#b8a6ff,#87e4e8);border-radius:99px;transition:width .6s}
+.radar-sparkline{width:100%;height:108px;margin:9px 0}
+.radar-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.radar-metric{border:1px solid #ffffff13;background:#ffffff06;border-radius:13px;padding:12px;display:grid;gap:7px;min-width:0}
+.radar-metric>span{font-size:10px;color:#adb0cb}
+.radar-metric strong{font-size:19px;letter-spacing:-.04em}
+.radar-metric-positive strong{color:#87e4e8}
+.radar-metric-negative strong,.radar-metric-elevated strong{color:#f5a0b6}
+.radar-metric-insufficient strong{font-size:13px;color:#aaaac6}
+.radar-metric small{font-size:9px;color:#8d93b2;line-height:1.55}
+.radar-details-toggle{margin-top:19px;width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px;border:1px solid #ffffff26;border-radius:12px;background:#ffffff08;color:#cbc3f3;font-size:11px}
+.radar-method-details{padding:14px 5px;font-size:11px;color:#adb0cd;line-height:1.7}
+.radar-breakdown-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff16}
+.radar-breakdown-row span{display:grid;gap:4px}
+.radar-breakdown-row small{color:#8088a7;font-size:9px}
+.radar-breakdown-row strong{white-space:nowrap;color:#d5cdf7}
+.radar-warning{color:#bbaaca;font-size:10px}
+.radar-footnote{margin:16px 0 0;font-size:9px;color:#9299b7;line-height:1.6}
+.radar-disclaimer{font-size:11px;color:#9098b8;line-height:1.8;border-top:1px solid #ffffff16;padding-top:18px}
+.radar-card-error{display:grid;gap:8px;font-size:12px;color:#a9acc9;padding:32px 0}
+.radar-card-error strong{color:#f5a0b6}
+@media(max-width:1020px){.radar-result-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+ .radar-intro{display:block}
+ .radar-method-pill{display:inline-flex;margin-top:9px}
+ .radar-scan-control{padding:17px}
+ .radar-buttons{width:100%}
+ .radar-buttons button{flex:1 1 145px}
+ .radar-card{padding:17px}
+ .radar-score-line strong{font-size:32px}
+ .radar-metric strong{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){.radar-score-rail>div{transition:none!important}}
