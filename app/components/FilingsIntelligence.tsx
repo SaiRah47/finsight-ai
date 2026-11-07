@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import RetrievalBenchmark from './RetrievalBenchmark';
+import EvidenceReview from './EvidenceReview';
 type Filing={id:string;form:string;filed:string;reportDate:string|null;url:string;description:string};
 type Fact={id:string;label:string;value:number;unit:string;end:string;filed:string;form:string;url:string};
 type Passage={id:string;section:string;text:string;score:number;matchedTerms:string[];start:number;form:string;filed:string;url:string;accession:string};
@@ -72,6 +73,7 @@ export default function FilingsIntelligence({onResearch}:{onResearch?:(question:
      <div className="sec-match-metadata"><span>Keyword relevance: {passage.score.toFixed(2)}</span><span>Matched terms: {passage.matchedTerms.length?passage.matchedTerms.slice(0,8).join(', '):'none'}</span></div>
      <p>{passage.text.length>800?passage.text.slice(0,800)+'…':passage.text}</p>
      {safeLink(passage.url)&&<a href={passage.url} target="_blank" rel="noreferrer">Read original SEC filing ↗</a>}
+     <EvidenceReview kind="retrieval" question={passageQuery} excerpt={passage.text} symbol={data.symbol} sourceUrl={passage.url} accession={passage.accession} rank={i+1}/>
     </article>)}
     {!passageData.passages.length&&<p>No matching document excerpts were available. Don't infer missing text from metadata.</p>}
     {passageData.warnings.length>0&&<details><summary>Retrieval notes ({passageData.warnings.length})</summary>{passageData.warnings.map((warning,i)=><p key={i}>{warning}</p>)}</details>}

@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {runDemoResearch} from '@/lib/agent';
+import {buildResearchReport} from '@/lib/research-report';
 import {authorizedOwner} from '@/lib/supabase/server';
 import {supabaseConfigured} from '@/lib/supabase/config';
 
@@ -23,6 +24,10 @@ export async function POST(request:Request){
     const result=await runDemoResearch(parsed.data.question,ev=>send('trace',{executionId,...ev}));
     const sources=result.sources.slice(0,10).map((s,i)=>({...s,id:'S'+(i+1)}));
     send('trace',{executionId,step:'evidence',status:sources.length?'complete':'unavailable',sources,sourceCount:sources.length,mode:result.synthesisMode,at:new Date().toISOString()});
+    const report=buildResearchReport({question:parsed.data.question,symbol:result.symbol,route:result.route,asOf:result.asOf,
+     mode:result.synthesisMode==='llm'?'ai-assisted':'evidence-only',answer:result.answer,evidence:result.evidence,sources});
+    send('trace',{executionId,step:'report',status:'complete',report,claimCount:report.auditSummary.claims,
+      flaggedClaims:report.auditSummary.unsupported,at:new Date().toISOString()});
     let persisted=false;
     if(owner){
      send('trace',{executionId,step:'persistence',status:'running',at:new Date().toISOString()});
@@ -36,7 +41,7 @@ export async function POST(request:Request){
      }
     }
     send('result',{executionId,answer:result.answer,mode:result.synthesisMode==='llm'?'ai-assisted':'evidence-only',
-     route:result.route,source:result.source,symbol:result.symbol,asOf:result.asOf,sources,persisted});
+     route:result.route,source:result.source,symbol:result.symbol,asOf:result.asOf,sources,report,persisted});
    }catch(error){
     send('error',{message:'Research workflow failed: '+(error instanceof Error?error.message:'unknown error')});
    }finally{controller.close()}
