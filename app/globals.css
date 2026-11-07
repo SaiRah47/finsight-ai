@@ -132,3 +132,20 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){
  .workspace-entering,.workspace-leaving,.auth-transition-overlay,.auth-transition-mark,.access-card,.auth-checking-pulse,.account-popover{animation:none!important;filter:none!important;transform:none!important}
 }
+
+/* Password login: select methods and manage a password in the account menu */
+.login-methods{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;margin:0 0 20px;border:1px solid #ffffff22;background:#0f1122;border-radius:14px}
+.login-methods button{padding:11px;border:0;border-radius:10px;background:transparent;color:#a7a9c6;font-size:12px;font-weight:750;transition:background .2s,color .2s}
+.login-methods button.selected{color:#181629;background:linear-gradient(115deg,#beaaff,#86e2e9);box-shadow:0 4px 15px #0004}
+.access-hint{font-size:11px!important;line-height:1.7!important;color:#9c9cb8!important;margin:16px 0 4px!important}
+.account-password-toggle{width:100%;border:0;text-align:left;color:#ddd7fc;background:transparent;border-radius:10px;font-size:12px;font-weight:650;padding:12px}
+.account-password-toggle:hover{background:#b8a6ff18}
+.account-password-form{display:grid;gap:8px;padding:8px 5px}
+.account-password-form label{font-size:10px;color:#bcb9d4}
+.account-password-form input{width:100%;background:#101122;border:1px solid #ffffff2e;border-radius:9px;padding:10px;color:#fff;font-size:12px}
+.account-password-form input:focus{outline:2px solid #87e4e8;outline-offset:1px}
+.account-password-form .primary{margin-top:6px}
+.account-password-form p{font-size:11px;line-height:1.5;color:#9fe3dc;margin:5px 0;overflow-wrap:anywhere}
+.account-back{border:0;background:transparent;color:#bfb1ff;text-align:left;padding:7px;font-size:11px}
+.account-popover:has(.account-password-form){width:min(310px,calc(100vw - 32px))}
+@media(prefers-reduced-motion:reduce){.login-methods button{transition:none}}
