@@ -67,3 +67,6 @@ Never use a `NEXT_PUBLIC_` prefix for these keys. Don't paste them into chat or 
 
 ## Quality evaluation and visible ranking diagnostics
 The SEC passage viewer displays lexical ranking scores and matched terms to aid debugging; scores are not confidence probabilities. A synthetic labeled retrieval benchmark now runs on every commit and archives a per-case CI report. See [retrieval evaluation](RETRIEVAL_EVALUATION.md) for exact definitions, regression gates and limitations.
+
+## Phase 5 correction: expanded but still bounded SEC ingestion
+The current downloader accepts up to 7.5 MB per SEC document, applies a timeout and per-instance cooldown, and extraction processes at most 840k characters with section-aware chunk boundaries. Earlier limits listed in this document describe the prior Phase 4 implementation. The SEC panel now reports coverage and download durations so a partial filing cannot be mistaken for a complete review. See [Phase 5](PHASE_5.md).

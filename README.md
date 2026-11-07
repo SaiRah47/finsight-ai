@@ -54,3 +54,7 @@ Milestone 4 includes a synthetic SEC-style labeled benchmark with Hit@1, Recall@
 ### Fixed-source SEC retrieval comparison (on demand)
 
 In the SEC filings tab, the **Real SEC retrieval lab** runs bounded, owner-only comparisons against fixed official 10-K sources from NVIDIA, Microsoft, and Apple. It compares our weighted lexical ranker with BM25 and reports source coverage and evidence-anchor rank. An optional embeddings-based **candidate reranker** is available only after explicit user opt-in and configuring a server-only OpenAI API key; it may incur costs. The experiment is not a statistically meaningful production benchmark. See [evaluation details](docs/RETRIEVAL_EVALUATION.md).
+
+## Phase 5 — research quality engineering
+
+The app now includes extended bounded SEC ingestion, per-filing extraction diagnostics, structured research reports, conservative citation/number screening, a private human-review queue with Supabase RLS, and a Quality Lab showing saved-trace timings and review diagnostics. To enable saving user review labels, apply the SQL migration `supabase/migrations/202611070002_phase5_evaluations.sql` in Supabase. The 36 candidate prompts are *unlabeled*; no independently reviewed 30–50-case ground truth is claimed. Read the [Phase 5 runbook](docs/PHASE_5.md).
