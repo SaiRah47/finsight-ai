@@ -588,3 +588,42 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
 @media(max-width:850px){.monitor-grid{grid-template-columns:1fr}}
 
 .monitor-run-details{flex-basis:100%;font-size:10px;color:#e7bd91;line-height:1.6}.monitor-run-details summary{cursor:pointer}.monitor-run-details p{margin:8px 0 0;overflow-wrap:anywhere}
+
+/* Phase 8 Investor League and paused intraday traders */
+.arena-workspace{display:grid;gap:19px;padding-bottom:35px}
+.arena-banner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.arena-banner>div{padding:21px;display:grid;gap:8px;border:1px solid #bca7ff30;border-radius:17px;background:linear-gradient(135deg,#252244,#171d33)}
+.arena-banner small{font-size:10px;letter-spacing:.07em;color:#b4b4d0}
+.arena-banner strong{font-size:clamp(23px,3vw,33px);color:#ede9ff}
+.arena-banner span{font-size:10px;color:#9eabc6;line-height:1.6}
+.arena-actions{display:flex;align-items:center;justify-content:space-between;gap:13px;flex-wrap:wrap;padding:18px;background:#151b31;border-radius:16px;border:1px solid #ffffff1f}
+.arena-actions>div{flex:1 1 300px}
+.arena-actions h3{font-size:17px;margin:0 0 7px}
+.arena-actions p{font-size:11px;color:#abb8d1;line-height:1.7}
+.arena-agent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.arena-agent-card{border:1px solid #ffffff23;border-radius:17px;padding:20px;background:linear-gradient(140deg,#201f39,#171e32)}
+.arena-agent-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.arena-agent-title strong{font-size:17px;color:#e5dfff}
+.arena-agent-title span{font-size:10px;padding:5px 9px;color:#91ddd5;border-radius:25px;background:#85e2d614}
+.arena-agent-card>p{font-size:11px;color:#aeb9d3;line-height:1.7;min-height:38px}
+.arena-agent-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+.arena-agent-stats>div{display:grid;gap:6px;background:#101628;border-radius:10px;padding:12px}
+.arena-agent-stats small{font-size:9px;color:#a1aecb}
+.arena-agent-stats strong{font-size:clamp(12px,1.4vw,16px);color:#dcd7f8;overflow-wrap:anywhere}
+.arena-positions{display:grid;gap:6px;border-top:1px solid #ffffff19;padding-top:12px}
+.arena-positions small{font-size:10px;color:#94aed0}
+.arena-positions span{font-size:11px;color:#c6cbe4}
+.arena-trader-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.arena-trader-grid>div{display:grid;gap:10px;border:1px dashed #ffffff30;border-radius:14px;padding:18px;background:#ffffff06}
+.arena-trader-grid strong{font-size:14px;color:#d7cff1}
+.arena-trader-grid span,.arena-trader-grid small{font-size:10px;color:#9aa7c7;line-height:1.65}
+.arena-history{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.arena-history-item{padding:11px 0;border-bottom:1px solid #ffffff19;display:grid;gap:7px}
+.arena-history-item strong{font-size:11px;color:#e0d8ff}
+.arena-history-item span,.arena-history-item small,.arena-history-item p{font-size:10px;color:#aebad4;line-height:1.7}
+.arena-history-item summary{font-size:11px;color:#ccd4ef;cursor:pointer}
+.arena-cycle-summary{padding:17px;border:1px solid #86e4d545;border-radius:14px;background:#87e4e80a}
+.arena-cycle-summary>strong{font-size:13px;color:#a8eee4}
+.arena-cycle-summary p{font-size:11px;color:#c5d0e3;line-height:1.7}
+@media(max-width:900px){.arena-agent-grid,.arena-history{grid-template-columns:1fr}.arena-banner{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.arena-trader-grid,.arena-banner{grid-template-columns:1fr}.arena-agent-stats{grid-template-columns:1fr 1fr}}
