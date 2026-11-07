@@ -3,7 +3,7 @@
  * Extend via an instrument search/entity service before supporting arbitrary companies.
  * This module performs NO provider lookups and is safe to unit-test.
  */
-const ALIASES:ReadonlyArray<readonly [string,string]>= [
+const ALIASES = ([
  ['NVIDIA','NVDA'],['NVIDIA CORPORATION','NVDA'],
  ['APPLE','AAPL'],['APPLE INC','AAPL'],
  ['MICROSOFT','MSFT'],['MICROSOFT CORPORATION','MSFT'],
@@ -12,7 +12,7 @@ const ALIASES:ReadonlyArray<readonly [string,string]>= [
  ['TESLA','TSLA'],['META PLATFORMS','META'],['FACEBOOK','META'],
  ['ADVANCED MICRO DEVICES','AMD'],['NETFLIX','NFLX'],
  ['SPDR S&P 500','SPY'],['INVESCO QQQ','QQQ']
-].sort((a,b)=>b[0].length-a[0].length);
+] as Array<[string,string]>).sort((a,b)=>b[0].length-a[0].length);
 const SYMBOLS=new Set(['AAPL','NVDA','MSFT','AMZN','GOOGL','GOOG','TSLA','META','SPY','QQQ','AMD','NFLX']);
 function escapeRegex(value:string){return value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
 const validTicker=(value:string)=>/^[A-Z][A-Z0-9.\-]{0,11}$/.test(value);
