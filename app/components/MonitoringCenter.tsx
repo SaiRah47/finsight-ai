@@ -27,6 +27,18 @@ export default function MonitoringCenter(){
   }catch(e){setError(e instanceof Error?e.message:'Unable to save preferences')}
   finally{setBusy(false)}
  }
+ async function runNow(){
+  setBusy(true);setError('');setMessage('');
+  try{
+   const r=await fetch('/api/monitor/run',{method:'POST'}),payload=await r.json();
+   if(!r.ok)throw Error(payload.error||'Scheduled scan unavailable');
+   setMessage(payload.status==='duplicate'?'This UTC day has already been scanned. The next scan is scheduled for the following day.':
+    payload.status==='disabled'?'Enable monitoring before running the daily scan.':
+    'Daily scan '+payload.status+': '+payload.symbols+' rule tickers checked, '+payload.created+' new events.');
+   await load();
+  }catch(e){setError(e instanceof Error?e.message:'Scan unavailable')}
+  finally{setBusy(false)}
+ }
  async function markRead(id:string,read:boolean){
   try{
    const r=await fetch('/api/monitor',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,read})});
@@ -47,6 +59,7 @@ export default function MonitoringCenter(){
     <div className="monitor-toggle"><label><input type="checkbox" checked={draft.filings_enabled} onChange={e=>setDraft(p=>({...p,filings_enabled:e.target.checked}))}/> Include SEC filing change detection</label><small>First scan sets a baseline; existing filings do not generate historical alerts.</small></div>
     <div className="monitor-toggle"><label><input type="checkbox" checked={draft.email_enabled} disabled={!draft.enabled||!data?.configuration.emailProviderReady} onChange={e=>setDraft(p=>({...p,email_enabled:e.target.checked}))}/> Send email for new alerts (optional)</label><small>{data?.configuration.emailProviderReady?'Email provider appears configured. Email only when enabled.':'Configure Resend and email addresses in Vercel first.'}</small></div>
     <button className="primary" disabled={busy||!data} onClick={()=>void save()}>Save monitoring preferences</button>
+    <button className="secondary" style={{marginTop:10}} disabled={busy||!data?.settings.enabled} onClick={()=>void runNow()}>Run today's scan now ↗</button>
     <p className="atlas-hint">{data?.configuration.schedulerReady?'Scheduler secrets appear configured.':'Scheduled execution is not configured: add CRON_SECRET and SUPABASE_SECRET_KEY in Vercel.'} Vercel Hobby scheduling is approximate and not intended for minute-level or intraday alerts.</p>
    </div>
    <div className="atlas-phase6-panel"><h3>Monitoring snapshot</h3><div className="monitor-kpis">
