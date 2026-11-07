@@ -2,6 +2,7 @@ import 'server-only';
 import {createClient} from '@supabase/supabase-js';
 import {ARENA_STRATEGIES,calculatePaperBuy,selectInvestorCandidate} from './arena-strategies';
 import {getQuote} from './market';
+import {eligiblePaperQuote} from './arena-session';
 import type {SupabaseClient} from '@supabase/supabase-js';
 function admin():SupabaseClient{
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SECRET_KEY;
@@ -63,6 +64,8 @@ export async function runInvestorCycle(owner:string):Promise<{cycleDate:string;o
    const quote=await getQuote(symbol);
    observation=quote.asOf;
    if(quote.currency!=='USD'||quote.price<=0||!observation)throw Error('USD quote or observation date unavailable.');
+   const session=eligiblePaperQuote(new Date(),observation);
+   if(!session.eligible)throw Error(session.reason);
    // Investor agents deliberately do not use intraday data, unvalidated forecasts or leverage.
    const sizing=calculatePaperBuy(Number(agent.cash),quote.price,0.20,10,0);
    if(!sizing)throw Error('Insufficient virtual cash for one whole-share position under sizing limits.');
