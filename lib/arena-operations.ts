@@ -55,3 +55,28 @@ export function deterministicStage(stage:StudioStage,evidence:StudioEvidence[],t
   checks:['No leverage or shorts','No market orders','Never mutate Season 1','Source dates required']};
  return {stage,role:'Decision Council',status:'complete',headline:'Debate resolved',explanation:'The research and counterarguments are retained as an auditable paper-only study.',vote:'observe',confidence:'low',citedIds:ids,mode:'rules',checks:['No automatic trade']};
 }
+
+/**
+ * Calendar-date guard for provider observations. Twelve Data timestamps may be
+ * exchange-local and omit a timezone, so never treat their time as UTC.
+ * A five-day calendar window tolerates ordinary weekends and long weekends;
+ * older or future-dated observations cannot satisfy a research evidence gate.
+ * SEC filing dates are intentionally excluded from this market-data policy.
+ */
+export function observationFreshness(asOf:string|null,now:Date=new Date(),maxCalendarDays=5):
+ {valid:boolean;reason:'current'|'missing'|'invalid'|'future'|'stale'}{
+ if(!asOf)return {valid:false,reason:'missing'};
+ const match=/^(\d{4})-(\d{2})-(\d{2})(?:$|[ T])/.exec(asOf);
+ if(!match)return {valid:false,reason:'invalid'};
+ const y=Number(match[1]),m=Number(match[2]),d=Number(match[3]);
+ const observed=Date.UTC(y,m-1,d),parsed=new Date(observed);
+ if(parsed.getUTCFullYear()!==y||parsed.getUTCMonth()!==m-1||parsed.getUTCDate()!==d)
+  return {valid:false,reason:'invalid'};
+ const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+ const value=(type:string)=>Number(parts.find(p=>p.type===type)?.value);
+ const current=Date.UTC(value('year'),value('month')-1,value('day'));
+ const age=(current-observed)/86_400_000;
+ if(age<0)return {valid:false,reason:'future'};
+ if(age>maxCalendarDays)return {valid:false,reason:'stale'};
+ return {valid:true,reason:'current'};
+}
