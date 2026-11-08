@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {deterministicStage,decideStudioOutcome,knownCitations,type StudioEvidence,type RoleOutput} from '../lib/arena-operations.ts';
+import {deterministicStage,decideStudioOutcome,knownCitations,observationFreshness,type StudioEvidence,type RoleOutput} from '../lib/arena-operations.ts';
 const records:StudioEvidence[]=[
  {id:'E1',label:'Quote',value:'100 USD',asOf:'2026-11-06',source:'Test',url:null,available:true},
  {id:'E2',label:'Momentum',value:'5%',asOf:'2026-11-05',source:'Test',url:null,available:true},
@@ -25,4 +25,24 @@ test('even a supported debate only proposes consideration, never execution',()=>
 test('research mode explicitly indicates limited evidence',()=>{
  const r=deterministicStage('research',records.slice(2),'AI');
  assert.equal(r.status,'limited');assert.equal(r.mode,'rules');
+});
+
+test('a current exchange-calendar quote passes the evidence date gate',()=>{
+ const now=new Date('2026-11-08T15:00:00Z');
+ assert.equal(observationFreshness('2026-11-06 16:00:00',now).valid,true);
+});
+test('stale and future dated evidence cannot satisfy the market gate',()=>{
+ const now=new Date('2026-11-08T15:00:00Z');
+ assert.equal(observationFreshness('2026-10-30',now).reason,'stale');
+ assert.equal(observationFreshness('2026-11-09',now).reason,'future');
+});
+test('malformed provider dates are rejected without guessing timezone',()=>{
+ const now=new Date('2026-11-08T15:00:00Z');
+ assert.equal(observationFreshness(null,now).reason,'missing');
+ assert.equal(observationFreshness('2026-02-30',now).reason,'invalid');
+ assert.equal(observationFreshness('not-a-date',now).reason,'invalid');
+});
+test('exchange calendar uses New York date near UTC midnight',()=>{
+ const now=new Date('2026-11-09T01:00:00Z');
+ assert.equal(observationFreshness('2026-11-09',now).reason,'future');
 });
