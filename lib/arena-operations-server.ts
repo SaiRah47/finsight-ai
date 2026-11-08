@@ -4,7 +4,7 @@ import {getQuote} from './market';
 import {analyzeSymbol} from './radar';
 import {getCompanyFilings} from './sec';
 import {strategyFor} from './arena-strategies';
-import {deterministicStage,decideStudioOutcome,knownCitations,STUDIO_STAGES,type RoleOutput,type StudioEvidence,type StudioStage,type StudioTrace} from './arena-operations';
+import {deterministicStage,decideStudioOutcome,knownCitations,observationFreshness,STUDIO_STAGES,type RoleOutput,type StudioEvidence,type StudioStage,type StudioTrace} from './arena-operations';
 
 type Event={kind:'stage-start'|'stage-complete'|'result';stage?:StudioStage;role?:RoleOutput;trace?:StudioTrace;at:string};
 const event=(cb:(e:Event)=>void,entry:Omit<Event,'at'>)=>cb({...entry,at:new Date().toISOString()});
@@ -20,14 +20,20 @@ async function gather(symbol:string){
  const [quote,risk,filing]=await Promise.allSettled([getQuote(symbol),analyzeSymbol(symbol),getCompanyFilings(symbol,{includeFacts:false})]);
  if(quote.status==='fulfilled'){
   const q=quote.value;
+  const freshness=observationFreshness(q.asOf);
+  const trusted=q.currency==='USD'&&q.price>0&&freshness.valid;
   items.push(make('E1','Market quote',q.price+' '+q.currency+'; daily change '+(q.changePercent===null?'unavailable':q.changePercent.toFixed(2)+'%'),
-   q.asOf,'Twelve Data','https://twelvedata.com',q.currency==='USD'&&q.price>0&&!!q.asOf));
+   q.asOf,'Twelve Data','https://twelvedata.com',trusted));
+  if(!freshness.valid)warnings.push('Quote: source timestamp '+freshness.reason+'; excluded from risk and decision gates.');
+  if(q.currency!=='USD'||q.price<=0)warnings.push('Quote: unsupported currency or non-positive price; excluded from risk and decision gates.');
  }else{items.push(make('E1','Market quote','Unavailable',null,'Twelve Data',null,false));warnings.push('Quote: '+failure(quote.reason))}
  if(risk.status==='fulfilled'){
   const r=risk.value,metric=(id:string)=>r.metrics.find(x=>x.id===id)?.value??null;
   const momentum=metric('momentum20'),volatility=metric('volatility20');
-  items.push(make('E2','20-session momentum',momentum===null?'Insufficient data':momentum+'%',r.lastDate,'Historical prices','https://twelvedata.com',momentum!==null));
-  items.push(make('E3','Annualized volatility (20 sessions)',volatility===null?'Insufficient data':volatility+'%',r.lastDate,'Historical prices','https://twelvedata.com',volatility!==null));
+  const freshness=observationFreshness(r.lastDate);
+  items.push(make('E2','20-session momentum',momentum===null?'Insufficient data':momentum+'%',r.lastDate,'Historical prices','https://twelvedata.com',momentum!==null&&freshness.valid));
+  items.push(make('E3','Annualized volatility (20 sessions)',volatility===null?'Insufficient data':volatility+'%',r.lastDate,'Historical prices','https://twelvedata.com',volatility!==null&&freshness.valid));
+  if(!freshness.valid)warnings.push('Historical prices: last completed session '+freshness.reason+'; technical signals excluded.');
  }else{for(const [id,label] of [['E2','20-session momentum'],['E3','Annualized volatility']] as const)items.push(make(id,label,'Unavailable',null,'Historical prices',null,false));warnings.push('Risk: '+failure(risk.reason))}
  if(filing.status==='fulfilled'){
   const f=filing.value.filings.find(x=>x.form==='10-K'||x.form==='10-Q');
