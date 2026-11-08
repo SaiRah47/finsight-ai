@@ -4,6 +4,7 @@ import {createClient} from '@supabase/supabase-js';
 import {getHistory,getQuote,validSymbol,type MarketQuote,type HistoricalSeries} from './market';
 import {getCompanyFilings} from './sec';
 import {inspectHistory,type HistoryQuality} from './market-quality';
+import {observationFreshness} from './arena-operations';
 
 export type FeedState='available'|'unavailable';
 export type SourceStatus={source:'Twelve Data'|'SEC EDGAR';dataset:'quote'|'history'|'fundamentals';state:FeedState;observedAt:string|null;retrievedAt:string|null;warning:string|null};
@@ -39,7 +40,7 @@ export async function getMarketIntelligence(symbol:string,includeFundamentals=fa
  const asOf=quote?.asOf??null;
  const date=asOf?.match(/^\d{4}-\d{2}-\d{2}/)?.[0]??null;
  const current=quality?.lastDate??null;
- const actionableEvidence=Boolean(quote&&quote.currency==='USD'&&quote.price>0&&quality?.acceptable&&date&&current&&
+ const actionableEvidence=Boolean(quote&&quote.currency==='USD'&&quote.price>0&&observationFreshness(quote.asOf).valid&&quality?.acceptable&&date&&current&&
   Math.abs((Date.parse(date+'T00:00:00Z')-Date.parse(current+'T00:00:00Z'))/86400000)<=5);
  return {symbol,generatedAt:new Date().toISOString(),simulationOnly:true,quote,history,
   fundamentals:sec?{name:sec.name,cik:sec.cik,facts:sec.facts,filings:sec.filings,fetchedAt:sec.fetchedAt}:null,
