@@ -21,6 +21,7 @@ export function inspectHistory(bars:DatedBar[],now:Date=new Date()):HistoryQuali
  const issue=(code:string,severity:'error'|'warning',message:string)=>issues.push({code,severity,message});
  const observed=exchangeDate(now),today=day(observed)!;
  if(!bars.length)issue('EMPTY','error','Provider returned no historical bars.');
+ if(bars.length>0&&bars.length<20)issue('INSUFFICIENT_HISTORY','warning','Fewer than 20 observations cannot support a reliable market signal.');
  let last=-Infinity;let firstDate:string|null=null,lastDate:string|null=null;
  for(const bar of bars){
   const t=day(bar.date);
@@ -39,6 +40,6 @@ export function inspectHistory(bars:DatedBar[],now:Date=new Date()):HistoryQuali
   if(age<0)issue('FUTURE_LAST_DATE','error','Latest market observation is future dated.');
  }
  // A dataset is stored even if stale, but the consumer must inspect its quality first.
- return {acceptable:!issues.some(x=>x.severity==='error')&&!issues.some(x=>x.code==='STALE'),
+ return {acceptable:!issues.some(x=>x.severity==='error')&&!issues.some(x=>['STALE','INSUFFICIENT_HISTORY'].includes(x.code)),
   observations:bars.length,firstDate,lastDate,issues,source:'Twelve Data'};
 }
