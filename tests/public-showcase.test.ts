@@ -6,6 +6,7 @@ const page=readFileSync('app/showcase/page.tsx','utf8');
 const experience=readFileSync('app/showcase/PublicShowcase.tsx','utf8');
 const gate=readFileSync('app/components/AccessGate.tsx','utf8');
 const css=readFileSync('app/showcase/showcase.module.css','utf8');
+const middleware=readFileSync('middleware.ts','utf8');
 
 test('showcase route is statically rendered without private owner gate or server data',()=>{
  assert.match(page,/dynamic='force-static'/);
@@ -26,4 +27,9 @@ test('owner sign-in makes public tour discoverable without modifying auth gates'
 test('mobile showcase uses accessible breakpoints and reduced-motion support',()=>{
  assert.match(css,/@media\(max-width:760px\)/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+});
+
+test('public route bypasses the Supabase session middleware before claims are checked',()=>{
+ assert.match(middleware,/pathname==='\/showcase'/);
+ assert.ok(middleware.indexOf("pathname==='/showcase'")<middleware.indexOf('client.auth.getClaims()'));
 });
