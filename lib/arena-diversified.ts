@@ -74,7 +74,7 @@ export function simulateDiversifiedLeague(datasets:ReplayDataset[]):LeagueTourna
   let cash=5000;const trades:LeagueTrade[]=[],debates:LeagueDebate[]=[],curve:LeaguePoint[]=[];
   for(let t=20;t<common.length;t++){
    const date=common[t],signalDate=common[t-1];
-   if(t===20||(t-20)%20===0){
+   if(t===20||(profile.slug!=='benchmark'&&(t-20)%20===0)){
     const targets=new Map<string,number>();
     for(const symbol of profile.symbols){
      const closes=common.slice(t-20,t).map(day=>observed(symbol,day).close);
