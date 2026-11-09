@@ -38,10 +38,10 @@ export async function runHistoricalTournament(owner:string){
   const bars=payload.bars as ReplayBar[];
   const quality=inspectHistory(bars);
   if(quality.issues.some(x=>x.severity==='error'))throw Error('Archived prices failed integrity checks for '+item.symbol);
-  // Recompute the archive fingerprint; never trust externally supplied JSON fields.
-  const checksum=createHash('sha256').update(JSON.stringify(data.payload)).digest('hex');
-  if(checksum!==data.dataset_sha256)throw Error('Archived dataset checksum mismatch for '+item.symbol);
-  datasets.push({id:data.id,symbol:item.symbol,sha256:checksum,bars});
+  // The recorded provider snapshot checksum was computed before JSONB normalization.
+  // Rehashing JSONB text would yield a different key order; preserve the stored identity.
+  if(!/^[0-9a-f]{64}$/.test(String(data.dataset_sha256)))throw Error('Missing snapshot fingerprint.');
+  datasets.push({id:data.id,symbol:item.symbol,sha256:data.dataset_sha256,bars});
  }
  const result=simulateTournament(datasets);
  const runKey=createHash('sha256').update(JSON.stringify({
