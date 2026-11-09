@@ -136,8 +136,8 @@ export default function AccessGate({children}:{children:ReactNode}){
   </form>
   <p className="access-hint">{method==='password'?'New to password login? Sign in once using Email link, then open your account menu to set a password.':'Magic links are limited by Supabase email quotas. Password sign-in sends no email.'}</p>
  </>}
- <a href="/showcase" style={{display:'block',marginTop:18,padding:'15px 16px',border:'1px solid #8acbc96e',borderRadius:13,background:'linear-gradient(100deg,#80e1cc14,#b2a3ff15)',color:'#d6e8fc',textDecoration:'none',fontWeight:800,fontSize:13,textAlign:'center'}}>✦ Explore the public FinSight AI demo ↗</a>
- <p className="access-hint">Recruiters and visitors: the public demo is available without signing in and never exposes owner data.</p>
+ <a href="/showcase" style={{display:'block',marginTop:18,padding:'15px 16px',border:'1px solid #8acbc96e',borderRadius:13,background:'linear-gradient(100deg,#80e1cc14,#b2a3ff15)',color:'#d6e8fc',textDecoration:'none',fontWeight:800,fontSize:13,textAlign:'center'}}>✦ Explore FinSight AI Showcase ↗</a>
+ <p className="access-hint">Explore a sample-data-only interactive walkthrough without signing in. The private workspace is not accessible through the showcase.</p>
  {(status==='denied'||status==='setup')&&<button className="secondary" onClick={()=>void logout()}>Sign out</button>}
  {message&&<p role="status" className="access-message">{message}</p>}
  <small>Personal workspace · Secure account access · No brokerage connectivity</small></div></main>;
