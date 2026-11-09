@@ -84,6 +84,7 @@ export default function DiversifiedLeague(){
  const ready=state?.coverage.length===LEAGUE_SYMBOLS.length&&state.coverage.every(x=>x.archive);
  const current=state?.runs[0]?.result;const leaderboard=[...(current?.results??[])].sort((a,b)=>b.returnPct-a.returnPct);
  const archived=state?.coverage.filter(x=>x.archive).length??0;
+ const missing=LEAGUE_SYMBOLS.filter(symbol=>!state?.coverage.find(x=>x.symbol===symbol)?.archive);
  return <section className="atlas-phase6-panel" style={{marginTop:22}}>
   <div className="sectiontitle"><h2>Phase 11.2 · Multi-Stock Strategy League</h2><span className="pill">HISTORICAL · VIRTUAL ONLY</span></div>
   <p className="muted">Four independent $5,000 simulated portfolios with different deterministic rules; one SPY buy-and-hold benchmark. Compare return, risk, and dated strategy debates under identical daily-price execution assumptions. No broker or real orders.</p>
