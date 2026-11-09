@@ -27,7 +27,7 @@ test('prior close signals are never stamped on their own next-day fill',()=>{
 test('future close cannot alter past simulated trades',()=>{
  const original=fixtures();const before=simulateTournament(original);
  const modified=fixtures();
- for(const d of modified)for(const b of d.bars.slice(-1))b.close*=0.9;
+ for(const d of modified)for(const b of d.bars.slice(-1))b.close-=0.5;
  const after=simulateTournament(modified);
  for(let i=0;i<4;i++)assert.deepEqual(after.results[i].orders,before.results[i].orders);
 });
