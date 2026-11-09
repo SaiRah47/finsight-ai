@@ -15,3 +15,25 @@
 @media(max-width:1050px){.wrap{width:min(100% - 40px,1100px)}.hero{grid-template-columns:minmax(0,1fr) minmax(300px,.7fr)}.hero h1{font-size:clamp(39px,5.2vw,62px)}.heroVisual{transform:scale(.87)}.privacy{display:none}.statRow>div{display:grid;gap:4px}.demoBody{grid-template-columns:250px 1fr}.agentProfile{padding:24px}.flowPanel{padding:25px 20px}.stageList{gap:5px}.stageList button{padding:10px 6px}.stageList button b{font-size:10px}.scoreSection{gap:25px}}
 @media(max-width:760px){.wrap{width:calc(100% - 32px)}.header{padding:17px 0}.headerActions{gap:6px}.headerActions .ownerLink{display:none}.headerActions .outlineButton{font-size:10px!important;padding:11px}.brand{font-size:18px}.brand small{font-size:8px}.mark{width:33px;height:33px}.hero{display:flex;flex-direction:column;padding:47px 0 22px;min-height:0;align-items:stretch;gap:0}.hero h1{font-size:clamp(38px,9vw,57px)}.heroVisual{height:345px;transform:scale(.78);margin:-6px -20px 0}.heroFoot{margin-top:28px}.statRow{grid-template-columns:repeat(2,1fr);gap:0;padding:15px 0;margin-bottom:65px}.statRow>div{padding:15px!important;border-bottom:1px solid #ffffff14;gap:4px}.statRow>div:nth-child(2){border-right:0}.statRow>div:nth-child(n+3){border-bottom:0}.statRow strong{font-size:26px}.statRow span{font-size:10px}.experience,.architecture{padding-bottom:68px}.demoFrame{border-radius:15px}.strategyTabs{grid-template-columns:repeat(2,1fr)}.strategyTabs button{padding:13px 8px;font-size:10px}.demoBody{display:flex;flex-direction:column}.agentProfile{border-right:0;border-bottom:1px solid #ffffff1c;padding:21px}.profileSymbol{margin:13px 0}.agentProfile h3{font-size:20px}.agentProfile p{margin:9px 0}.cashBar{margin-top:15px}.profileDivider{margin:11px 0}.flowPanel{padding:21px 14px}.flowHeading h3{font-size:17px}.stageList{overflow-x:auto;display:flex;scrollbar-width:thin;padding-bottom:6px}.stageList button{flex:0 0 110px}.debateCard{padding:17px}.debateCard>p{font-size:12px}.lifecycle,.archGrid,.scorePanels{grid-template-columns:1fr 1fr}.scoreSection{grid-template-columns:1fr;padding-bottom:65px}.cta{flex-direction:column;align-items:stretch;padding:27px 20px}.ctaActions{min-width:0}.footer{flex-wrap:wrap}.footer small{display:block;margin:7px 0 0}.scoreVisual{padding:20px}.sectionIntro h2{font-size:clamp(32px,8vw,46px)}}
 @media(max-width:430px){.heroVisual{transform:scale(.65);margin:-30px -55px}.lifecycle,.archGrid,.scorePanels{grid-template-columns:1fr}.headerActions .outlineButton{font-size:9px!important;padding:9px}.heroFoot{font-size:8px}.statRow strong{font-size:24px}.stageControls span{display:none}.scoreVisualHeader{font-size:8px}.scoreVisual{padding:15px}.fakeBar{grid-template-columns:36px 1fr 49px;gap:9px}.demoTopbar{font-size:8px}.sectionKicker{font-size:9px}}
+
+/* Isolated, sample-only interactive showcase */
+.scenarioPanel{display:flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid #8a8be64d;border-radius:18px;background:linear-gradient(115deg,#18233a,#141a2d);padding:25px;margin:0 0 18px}
+.scenarioPanel h3,.tournamentHeading h3{margin:8px 0;font-size:21px;letter-spacing:-.5px}
+.scenarioPanel p,.tournamentResult>p{color:#a6b7cb;font-size:11px;line-height:1.8;max-width:480px;margin:5px 0}
+.scenarioActions{display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.scenarioPicker{display:flex;flex-wrap:wrap;gap:6px}
+.scenarioPicker button{background:#ffffff08;color:#aebbd2;border:1px solid #ffffff28;border-radius:9px;padding:10px 12px;cursor:pointer;font-size:11px;font-weight:700}
+.scenarioPicker .scenarioActive{background:#b8aeff24;border-color:#bab0ff;color:#fff}
+.tournamentResult{border:1px solid #7fdcc859;border-radius:18px;background:#101e2a;padding:25px;margin-bottom:18px}
+.tournamentHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.resultGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.resultCard{display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;cursor:pointer;border:1px solid #ffffff24;background:#ffffff08;color:#d9e4f3;border-radius:12px;padding:18px;min-width:0}
+.resultCard:hover{border-color:#aea6fc;background:#ffffff12}
+.resultCard span{font-size:11px;font-weight:750;min-height:30px}
+.resultCard strong{font-size:25px;letter-spacing:-1px}
+.resultCard small{font-size:10px;color:#a6b6cd}
+.tournamentResult>p{max-width:none;margin:17px 0 0}
+.techStack{margin-top:32px;padding:23px 0;border-bottom:1px solid #ffffff1b}
+.techStack p{color:#b5c4da;font-size:12px;line-height:1.8}
+@media(max-width:900px){.scenarioPanel{flex-direction:column;align-items:stretch}.scenarioActions{align-items:stretch}.resultGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.scenarioPanel,.tournamentResult{padding:16px}.scenarioPicker button{flex:1}.resultGrid{grid-template-columns:1fr 1fr}.resultCard{padding:12px}.resultCard strong{font-size:19px}.tournamentHeading{align-items:flex-start;flex-direction:column}}
