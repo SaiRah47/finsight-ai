@@ -11,9 +11,9 @@ function admin(){
 export async function replayHistory(owner:string){
  const db=admin();
  const {data,error}=await db.from('arena_replay_runs').select('id,run_key,start_date,end_date,sessions,symbols,created_at,result')
-  .eq('user_id',owner).order('created_at',{ascending:false}).limit(8);
+  .eq('user_id',owner).order('created_at',{ascending:false}).limit(40);
  if(error)throw Error('Simulation history unavailable. Apply Phase 11 migration.');
- return data??[];
+ return (data??[]).filter(x=>x.result?.version!==2).slice(0,8);
 }
 export async function replayCoverage(owner:string){
  const db=admin();
