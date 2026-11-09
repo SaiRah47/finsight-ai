@@ -52,11 +52,34 @@ export default function DiversifiedLeague(){
   }catch(e){setError(e instanceof Error?e.message:'Archive failed')}finally{setBusy('')}
  }
  async function run(){
-  setBusy('run');setError('');setNote('');
-  try{const res=await fetch('/api/arena/diversified',{method:'POST'});
-   const json=await res.json();if(!res.ok)throw Error(json.error||'Simulation failed');
-   await load();setNote('Diversified replay saved. Existing Season 1 forward-paper balances remain unchanged.');
-  }catch(e){setError(e instanceof Error?e.message:'Simulation failed')}finally{setBusy('')}
+  if(!state){setError('Market dataset readiness is still loading. Use Reload history and try again.');return}
+  setBusy('prepare');setError('');setNote('');
+  const missing=state.coverage.filter(item=>!item.archive).map(item=>item.symbol);
+  try{
+   // Each archive has its own request: provider quotas and failures are surfaced
+   // before the next symbol. Never infer or fabricate missing historical prices.
+   for(let index=0;index<missing.length;index++){
+    const symbol=missing[index];
+    setNote('Preparing '+(index+1)+' / '+missing.length+': downloading and archiving '+symbol+'…');
+    const res=await fetch('/api/market/intelligence',{method:'POST',
+     headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'archive-history',symbol})});
+    const body=await res.json();
+    if(!res.ok)throw Error(symbol+' could not be archived: '+(body.error||'Provider request failed')+
+      '. Saved datasets are retained; retry when the provider permits.');
+   }
+   if(missing.length)await load();
+   setBusy('run');setNote('All '+LEAGUE_SYMBOLS.length+' datasets ready. Simulating four virtual portfolios against SPY…');
+   const res=await fetch('/api/arena/diversified',{method:'POST'});
+   const json=await res.json();
+   if(!res.ok)throw Error(json.error||'Historical simulation could not complete');
+   await load();
+   setNote('Tournament completed and saved. Open the leaderboard below. Existing Season 1 accounts were not changed.');
+  }catch(e){
+   setError(e instanceof Error?e.message:'Tournament preparation failed');
+   setNote('');
+   // Preserve progress when a provider limit interrupts archiving.
+   try{await load()}catch{}
+  }finally{setBusy('')}
  }
  const ready=state?.coverage.length===LEAGUE_SYMBOLS.length&&state.coverage.every(x=>x.archive);
  const current=state?.runs[0]?.result;const leaderboard=[...(current?.results??[])].sort((a,b)=>b.returnPct-a.returnPct);
@@ -69,7 +92,7 @@ export default function DiversifiedLeague(){
    <p>{p.thesis}</p><small>{p.symbols.join(' · ')}</small>
   </div>)}</div>
   <div className="sectiontitle" style={{marginTop:20}}><h3>Data readiness</h3><span className="pill">{archived} / {LEAGUE_SYMBOLS.length} datasets</span></div>
-  <p className="muted">Archive source histories individually to respect provider quotas. SPY is required for a fair benchmark. Existing archives are reused; no historical prices are fabricated.</p>
+  <p className="muted">The Prepare & Run control automatically archives missing source histories sequentially, then launches the tournament. Previously archived datasets are reused. Provider quota errors are displayed without fabricating prices.</p>
   <div className="arena-trader-grid">{LEAGUE_SYMBOLS.map(symbol=>{
    const found=state?.coverage.find(x=>x.symbol===symbol)?.archive;
    return <div key={symbol}><strong>{symbol} {symbol==='SPY'?'· BENCHMARK':''}</strong>
@@ -79,12 +102,12 @@ export default function DiversifiedLeague(){
   })}</div>
   <div className="arena-actions" style={{marginTop:18}}>
    <div><h3>Competition control</h3><p>Warm up 20 common sessions; rebalance every 20 sessions using past closes; modeled next-open fills with 10 bps slippage on buys and sells, whole shares, no margin.</p></div>
-   <button className="primary" disabled={!!busy||!ready} onClick={run}>{busy==='run'?'Simulating…':'Run multi-stock tournament ↗'}</button>
+   <button className="primary" disabled={!!busy||!state} onClick={run} title={missing.length?'Will archive missing datasets first, then run the simulation':'Run the simulation on archived historical prices'}>{busy==='prepare'?'Preparing datasets…':busy==='run'?'Simulating…':!state?'Loading readiness…':ready?'Run multi-stock tournament ↗':'Prepare '+missing.length+' datasets & run ↗'}</button>
    <button className="secondary" disabled={!!busy} onClick={()=>load().catch(e=>setError(e.message))}>Reload history ↻</button>
   </div>
   {error&&<p className="market-alert" role="alert">{error}</p>}
-  {note&&<p className="monitor-success" role="status">{note}</p>}
-  {!ready&&<p className="atlas-warning">Archive all {LEAGUE_SYMBOLS.length} required tickers to unlock a historical league run. Live provider quotas can limit how quickly datasets are archived.</p>}
+  {note&&<p className="monitor-success" role="status" aria-live="polite">{note}</p>}
+  {state&&!ready&&<p className="atlas-warning" role="status">Ready: {archived} of {LEAGUE_SYMBOLS.length} datasets. Missing: <strong>{missing.join(', ')}</strong>. Select <strong>Prepare {missing.length} datasets & run</strong> to fetch them in sequence and run automatically. If your Twelve Data quota is reached, the exact failed symbol will appear above; return later to resume.</p>}
   {current&&<><div className="sectiontitle" style={{marginTop:22}}><h3>Risk-adjusted leaderboard</h3><span className="pill">{current.sessions} shared sessions · {current.startDate} – {current.endDate}</span></div>
    <div className="arena-agent-grid">{leaderboard.map((score,i)=><Competitor key={score.slug} score={score} rank={i+1} benchmark={current.benchmark.returnPct}/>)}
     <Competitor score={current.benchmark} rank={0} benchmark={current.benchmark.returnPct}/></div>
