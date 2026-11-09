@@ -4,6 +4,7 @@ import {ARENA_STRATEGIES} from '@/lib/arena-strategies';
 import ArenaLearningLab from './ArenaLearningLab';
 import ArenaEvolutionLab from './ArenaEvolutionLab';
 import AgentOperationsStudio from './AgentOperationsStudio';
+import ReplayTournamentPanel from './ReplayTournamentPanel';
 type Agent={id:string;slug:string;league:'investor'|'trader';status:string;cash:number};
 type Position={agent_id:string;symbol:string;shares:number;average_cost:number};
 type Order={id:string;agent_id:string;symbol:string;side:string;shares:number;fill_price:number;fee:number;reason:string;signal_date:string;created_at:string};
@@ -69,6 +70,7 @@ export default function AgentArena(){
   })}</div>
   <div className="sectiontitle"><h2>Trading League</h2><span className="pill">Paused / not evaluated</span></div>
   <div className="arena-trader-grid">{traders.map(agent=><div key={agent.id}><strong>{label(agent.slug)}</strong><span>{ARENA_STRATEGIES.find(s=>s.slug===agent.slug)?.thesis}</span><small>{currency(agent.cash)} virtual cash · {agent.status}</small></div>)}</div>
+  <ReplayTournamentPanel/>
   <AgentOperationsStudio agents={snapshot.agents}/>
   <ArenaLearningLab agents={snapshot.agents}/>
   <ArenaEvolutionLab agents={snapshot.agents}/>
