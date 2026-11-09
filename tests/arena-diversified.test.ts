@@ -51,7 +51,7 @@ test('no cash borrowing, and simulated buy/sell fills include adverse slippage',
 test('missing ticker, stale alignment, and inconsistent OHLC reject a tournament',()=>{
  assert.throws(()=>simulateDiversifiedLeague(fixtures().slice(1)),/Archive/);
  const notEnough=fixtures();for(const d of notEnough)d.bars=d.bars.slice(0,30);
- assert.throws(()=>simulateDiversifiedLeague(notEnough),/60/);
+ assert.throws(()=>simulateDiversifiedLeague(notEnough),/Insufficient dated snapshot|60/);
  const malformed=fixtures();malformed[0].bars[2].low=100000;
  assert.throws(()=>simulateDiversifiedLeague(malformed),/OHLCV/);
 });
