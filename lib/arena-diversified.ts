@@ -93,7 +93,7 @@ export function simulateDiversifiedLeague(datasets:ReplayDataset[]):LeagueTourna
       debates.push({day:date,signalDate,stage:'critic',role:'Counterargument Agent',message:'Historical technical signals can reverse, and concentration may increase drawdown. No contemporaneous fundamental advantage is proven.',sourceDates:[signalDate]});
      }
     }
-    const markOpen=profile.symbols.reduce((value,s)=>value+(holdings.get(s)??0)*observed(s,date).open,cash);
+    const markOpen=profile.symbols.reduce<number>((value,s)=>value+(holdings.get(s)??0)*observed(s,date).open,cash);
     // Sell down holdings before buying new targets; long-only, whole shares and no leverage.
     for(const symbol of profile.symbols){
      const open=observed(symbol,date).open,existing=holdings.get(symbol)??0;
@@ -125,7 +125,7 @@ export function simulateDiversifiedLeague(datasets:ReplayDataset[]):LeagueTourna
      debates.push({day:date,signalDate,stage:'decision',role:'Decision Council',message:trades.some(o=>o.day===date)?'Simulation-only rebalance recorded with next-open fills.':'No eligible adjustment; HOLD virtual positions.',sourceDates:[signalDate]});
     }
    }
-   const invested=profile.symbols.reduce((sum,s)=>sum+(holdings.get(s)??0)*observed(s,date).close,0);
+   const invested=profile.symbols.reduce<number>((sum,s)=>sum+(holdings.get(s)??0)*observed(s,date).close,0);
    const equity=rnd(cash+invested);
    if(cash< -0.001||!Number.isFinite(equity))throw Error('Invalid virtual ledger state');
    curve.push({date,equity,cash:rnd(cash),invested:rnd(invested)});
