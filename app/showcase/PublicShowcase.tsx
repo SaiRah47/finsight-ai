@@ -45,9 +45,18 @@ const architecture=[
  {number:'05',name:'Evaluation',desc:'Historical equity curves, drawdown, volatility, Sharpe, and SPY-relative comparisons.'},
  {number:'06',name:'Persistence & observability',desc:'Supabase versioned source snapshots, run history, debates, and traceable decisions.'}
 ];
+const scenarios=[
+ {id:'momentum',name:'Momentum rally',label:'Broad momentum',detail:'Illustrative upward-trending market where trend-following entries may receive support.',adjustments:[8.4,3.1,6.2,1.8]},
+ {id:'selloff',name:'Sharp selloff',label:'High volatility',detail:'Illustrative risk-off market with higher drawdown pressure and defensive trade-offs.',adjustments:[-12.6,-3.8,-10.9,-6.1]},
+ {id:'sideways',name:'Sideways market',label:'Range-bound',detail:'Illustrative sideways regime that challenges trend-following strategies.',adjustments:[-2.3,1.4,-1.2,2.8]}
+] as const;
 const representative=[{symbol:'NVDA',change:'+7.3%',tone:'up'},{symbol:'PG',change:'+2.1%',tone:'up'},{symbol:'SPY',change:'+4.5%',tone:'up'}];
 export default function PublicShowcase(){
  const [selected,setSelected]=useState(0),[stage,setStage]=useState(0),[view,setView]=useState<'workflow'|'architecture'|'scorecard'>('workflow'),[copied,setCopied]=useState(false);
+ const [scenario,setScenario]=useState(0),[hasRun,setHasRun]=useState(false);
+ const sample=scenarios[scenario];
+ const results=agents.map((a,i)=>({name:a.name,value:5000*(1+sample.adjustments[i]/100),change:sample.adjustments[i],color:a.color})).sort((a,b)=>b.value-a.value);
+ const selectedResult=results.find(r=>r.name===agents[selected].name)!;
  const active=agents[selected];
  async function share(){
   const url=window.location.origin+'/showcase';
@@ -72,7 +81,7 @@ export default function PublicShowcase(){
      <h1>Meet the AI agents.<br/><em>Watch them disagree.</em><br/>See what the data says.</h1>
      <p>FinSight AI is an evidence-first market intelligence system and a simulation-only laboratory for competing investment strategies. Explore the architecture, inspect an agent debate, and see how virtual decisions are evaluated—without an account.</p>
      <div className={styles.heroActions}><a href="#experience" className={styles.primaryButton}>Explore interactive demo <span>↘</span></a><a href="#architecture" className={styles.outlineButton}>See how it works</a></div>
-     <div className={styles.heroFoot}><span>PRIVATE PRODUCTION WORKSPACE</span><i/> <span>PUBLIC SANDBOX PREVIEW</span><i/><span>ZERO REAL TRADING</span></div>
+     <div className={styles.heroFoot}><span>PRIVATE PRODUCTION WORKSPACE</span><i/> <span>ISOLATED INTERACTIVE SAMPLE</span><i/><span>ZERO REAL TRADING</span></div>
     </div>
     <div className={styles.heroVisual} aria-label="Illustrative multi-agent orchestration visualization">
       <div className={styles.haloOne}/><div className={styles.haloTwo}/>
@@ -90,8 +99,20 @@ export default function PublicShowcase(){
     <div><strong>100%</strong><span>Simulation-only</span></div>
    </div>
    <section id="experience" className={styles.experience}>
-    <div className={styles.sectionIntro}><span className={styles.sectionKicker}>01 / THE EXPERIENCE</span><h2>A window into the <em>decision room.</em></h2><p>Pick a strategy, then move through its evidence, counterargument, risk review and virtual outcome. This is an illustrative walkthrough—not a recording of a real completed trade or a live model run.</p></div>
-    <div className={styles.demoFrame}>
+    <div className={styles.sectionIntro}><span className={styles.sectionKicker}>01 / THE EXPERIENCE</span><h2>A window into the <em>decision room.</em></h2><p>Choose a hypothetical market scenario, run a sample tournament, then inspect how each strategy responds. Every value is illustrative—not a live model run, historical backtest, or completed trade.</p></div>
+    <div className={styles.scenarioPanel}>
+      <div><span className={styles.fieldLabel}>TRY THE SANDBOX</span><h3>Choose a market scenario</h3><p>{sample.detail}</p></div>
+      <div className={styles.scenarioActions}>
+       <div className={styles.scenarioPicker} role="group" aria-label="Sample market scenario">{scenarios.map((s,i)=><button key={s.id} type="button" aria-pressed={scenario===i} className={scenario===i?styles.scenarioActive:''} onClick={()=>{setScenario(i);setHasRun(false);setStage(0)}}>{s.name}</button>)}</div>
+       <button type="button" className={styles.primaryButton} onClick={()=>{setHasRun(true);setStage(4)}}>▶ Run sample tournament</button>
+      </div>
+     </div>
+     {hasRun&&<section className={styles.tournamentResult} aria-live="polite" aria-label="Illustrative tournament results">
+      <div className={styles.tournamentHeading}><div><span className={styles.fieldLabel}>SANDBOX RESULTS · {sample.label.toUpperCase()}</span><h3>Four strategies. One hypothetical market.</h3></div><span className={styles.samplePill}>ILLUSTRATIVE ONLY</span></div>
+      <div className={styles.resultGrid}>{results.map((r,i)=><button type="button" key={r.name} onClick={()=>{setSelected(agents.findIndex(a=>a.name===r.name));setStage(4)}} className={styles.resultCard}><span>#{i+1} · {r.name}</span><strong style={{color:r.color}}>${r.value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong><small>{r.change>=0?'+':''}{r.change.toFixed(1)}% simulated</small></button>)}</div>
+      <p>These scenario outcomes are invented educational examples, not predicted returns or results generated by the production engine. Change the scenario to reset the experiment.</p>
+     </section>}
+     <div className={styles.demoFrame}>
      <div className={styles.demoTopbar}><span><i className={styles.demoLight}/> FINsight / OPERATIONS STUDIO</span><span>PUBLIC SAMPLE · INTERACTIVE</span></div>
      <div className={styles.strategyTabs} role="tablist" aria-label="Choose strategy">{agents.map((a,i)=><button key={a.id} role="tab" aria-selected={selected===i} onClick={()=>{setSelected(i);setStage(0)}} className={selected===i?styles.activeTab:''}><span style={{background:a.color}} className={styles.tabDot}/>{a.name}</button>)}</div>
      <div className={styles.demoBody}>
@@ -101,10 +122,10 @@ export default function PublicShowcase(){
        <h3>{active.name}</h3><span className={styles.tag}>{active.tag} · {active.role}</span>
        <p>{active.thesis}</p>
        <div className={styles.profileDivider}/><span className={styles.fieldLabel}>STRATEGY UNIVERSE</span><strong className={styles.universe}>{active.symbol}</strong>
-       <div className={styles.cashBar}><span>VIRTUAL STARTING BALANCE</span><b>$5,000.00</b></div>
+       <div className={styles.cashBar}><span>{hasRun?'ILLUSTRATIVE ENDING BALANCE':'VIRTUAL STARTING BALANCE'}</span><b>{hasRun?selectedResult.value.toLocaleString('en-US',{style:'currency',currency:'USD'}):'$5,000.00'}</b></div>
       </aside>
       <div className={styles.flowPanel}>
-       <div className={styles.flowHeading}><div><span className={styles.fieldLabel}>AGENT WORKFLOW / WALKTHROUGH</span><h3>One decision, five perspectives.</h3></div><span className={styles.fakeLive}>● DEMO</span></div>
+       <div className={styles.flowHeading}><div><span className={styles.fieldLabel}>AGENT WORKFLOW / WALKTHROUGH</span><h3>One decision, five perspectives.</h3></div><span className={styles.fakeLive}>● SAMPLE DATA</span></div>
        <div className={styles.stageList}>{stages.map((s,i)=><button key={s.name} className={stage===i?styles.currentStage:''} onClick={()=>setStage(i)} aria-current={stage===i?'step':undefined}><span>{String(i+1).padStart(2,'0')}</span><b>{s.name}</b><small>{i===stage?'INSPECTING':i<stage?'REVIEWED':'VIEW'}</small></button>)}</div>
        <div className={styles.debateCard}><div className={styles.debateTop}><span className={styles.roleIcon}>{['◈','✦','◇','⬡','✓'][stage]}</span><div><span className={styles.fieldLabel}>{stages[stage].who.toUpperCase()}</span><h4>{stages[stage].name} / {active.name}</h4></div></div>
        <p>{[active.stance,active.stance,active.challenge,active.guardrail,active.decision][stage]}</p><div className={styles.evidenceTag}>◇ Illustrative workflow · Not real-time financial data</div>
@@ -124,6 +145,7 @@ export default function PublicShowcase(){
     </div><div className={styles.scoreCopy}><span className={styles.sectionKicker}>03 / ENGINEERING PRINCIPLES</span><h2>Transparent by design.<br/><em>Tested by construction.</em></h2><p>FinSight separates research evidence from model output, separates historical replay from forward-paper simulation, and keeps owner-only production data behind authentication and database row-level security.</p><div className={styles.featureGrid}><span>✓ Next-session replay fills</span><span>✓ No lookahead signals</span><span>✓ Audit history</span><span>✓ Source freshness checks</span><span>✓ Independent virtual cash</span><span>✓ Risk-based abstention</span></div></div>
    </section>
    <section className={styles.cta}><div><span className={styles.sectionKicker}>THE TAKEAWAY</span><h2>An engineering laboratory for<br/><em>explainable AI decisions.</em></h2><p>Built to explore agent orchestration, backend reliability, structured evidence, and reproducible strategy evaluation. The public tour uses hardcoded illustrative content and does not query owner-only APIs.</p></div><div className={styles.ctaActions}><button onClick={()=>void share()} className={styles.primaryButton}>{copied?'Link copied ✓':'Share this project ↗'}</button><Link className={styles.outlineButton} href="/">Private workspace sign-in</Link></div></section>
+   <div className={styles.techStack}><span className={styles.fieldLabel}>BUILT WITH</span><p>Next.js · React · TypeScript · Supabase · PostgreSQL · Vercel · Multi-agent orchestration · SEC EDGAR · Twelve Data</p></div>
    <footer className={styles.footer}><span>✦ FINSIGHT AI <small>PERSONAL SOFTWARE ENGINEERING PROJECT</small></span><span>Public demo data only · No account access · No real-money trading</span><a href="#experience">Back to demo ↑</a></footer>
   </div>
  </main>;
